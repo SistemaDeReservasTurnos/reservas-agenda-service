@@ -12,4 +12,3 @@ public interface ServiceClient {
     @GetMapping("/api/services/{id}")
     Optional<ServiceDTO> findServiceById(@PathVariable("id") Long id);
 }
-
