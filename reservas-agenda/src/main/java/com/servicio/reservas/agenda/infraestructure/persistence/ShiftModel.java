@@ -17,16 +17,16 @@ public class ShiftModel {
     private Long id;
 
     @Column(nullable = false)
-    private Long barber_id;
+    private Long barberId;
 
     @Column(nullable = false)
     private LocalDate date;
 
     @Column(nullable = false)
-    private LocalTime time_start;
+    private LocalTime timeStart;
 
     @Column(nullable = false)
-    private LocalTime time_end;
+    private LocalTime timeEnd;
 
     @Column(nullable = false, length = 50)
     private String state;
