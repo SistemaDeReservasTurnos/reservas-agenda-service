@@ -54,6 +54,24 @@ public class ShiftService implements IShiftService {
     }
 
     @Override
+    public boolean validateAvailabilityBarberForUpdate(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime, Long shiftId) {
+        if (barberId == null) {
+            throw new CustomException("The field barberId cannot be null");
+        }
+        if (date == null) {
+            throw new CustomException("The field date cannot be null");
+        }
+        if (startTime == null || endTime == null) {
+            throw new CustomException("Start time and end time must be provided");
+        }
+        boolean existsOverlap = shiftRepository.existsOverlappingReservationUpdate(barberId, date, startTime, endTime, shiftId);
+        if (existsOverlap) {
+            throw new CustomException("The selected time overlaps with another shift");
+        }
+        return true;
+    }
+
+    @Override
     public boolean validateAvailabilityBarber(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         if (barberId == null) {
             throw new CustomException("The field barberId cannot be null");
@@ -64,7 +82,7 @@ public class ShiftService implements IShiftService {
         if (startTime == null || endTime == null) {
             throw new CustomException("Start time and end time must be provided");
         }
-        boolean existsOverlap = shiftRepository.existsOverlappingReservation(barberId, date, startTime, endTime);
+        boolean existsOverlap = shiftRepository.existsOverlappingReservationCreate(barberId, date, startTime, endTime);
         if (existsOverlap) {
             throw new CustomException("The selected time overlaps with another shift");
         }
@@ -101,4 +119,23 @@ public class ShiftService implements IShiftService {
         validationService(serviceId);
         validateAvailabilityBarber(barberId, date, start, end);
     }
+
+    @Override
+    public Shift updateShift(Long id, Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        Shift existingShift = findById(id);
+
+        existingShift.setBarberId(barberId);
+        existingShift.setDate(date);
+        existingShift.setTimeStart(startTime);
+        existingShift.setTimeEnd(endTime);
+
+        return shiftRepository.save(existingShift);
+    }
+
+    public Shift findById(Long id) {
+        return shiftRepository.findById(id)
+                .orElseThrow(() -> new CustomException("Shift not found with id: " + id));
+    }
+
+
 }
