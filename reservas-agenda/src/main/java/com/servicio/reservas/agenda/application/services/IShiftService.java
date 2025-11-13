@@ -1,11 +1,17 @@
 package com.servicio.reservas.agenda.application.services;
 
+import com.servicio.reservas.agenda.domain.entities.Shift;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 
 public interface IShiftService {
-    void shiftValidation(LocalTime start, LocalTime end);
+    void validateWorkSchedule(LocalTime start, LocalTime end);
     Optional<ServiceDTO> validationService(Long serviceId);
+    void validateShiftDateTime(LocalDate date, LocalTime startTime);
+    boolean validateAvailabilityBarber(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime);
+    Shift createShift(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime);
+    void deleteShift(Long id);
 }

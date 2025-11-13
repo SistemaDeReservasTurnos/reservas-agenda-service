@@ -7,11 +7,11 @@ public class ShiftMapper {
     public static ShiftModel toModel(Shift shift) {
         ShiftModel model = new ShiftModel();
         model.setId(shift.getId());
-        model.setBarberId(shift.getBarber_id());
+        model.setBarberId(shift.getBarberId());
         model.setDate(shift.getDate());
-        model.setTimeStart(shift.getTime_start());
-        model.setTimeEnd(shift.getTime_end());
-        model.setState(shift.getState());
+        model.setTimeStart(shift.getTimeStart());
+        model.setTimeEnd(shift.getTimeEnd());
+        model.setState("reserved");
         return model;
     }
 

@@ -1,13 +1,12 @@
 package com.servicio.reservas.agenda.infraestructure.controller;
 
+import com.servicio.reservas.agenda.application.dto.RequestShift;
+import com.servicio.reservas.agenda.application.services.ShiftService;
+import com.servicio.reservas.agenda.domain.entities.Shift;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.servicio.reservas.agenda.application.services.TimeBlocksService;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.time.LocalDate;
@@ -17,7 +16,7 @@ import java.time.LocalTime;
 @RequestMapping("/api/time-blocks")
 @RequiredArgsConstructor
 public class TimeBlocksController {
-    private final TimeBlocksService timeBlocksService;
+    private final ShiftService  shiftService;
 
     @GetMapping("/availability")
     public ResponseEntity<Boolean> verifyAvailability(
@@ -26,8 +25,21 @@ public class TimeBlocksController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
 
-        boolean available = timeBlocksService
-                .validate(idBarber, date, startTime, endTime);
+        boolean available = shiftService
+                .validateAvailabilityBarber(idBarber, date, startTime, endTime);
         return ResponseEntity.ok(available);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Shift> create(@RequestBody RequestShift request) {
+        Shift shiftResponse = shiftService.createShift
+                (request.getBarberId(), request.getDate(), request.getTimeStart(), request.getTimeEnd());
+        return ResponseEntity.ok(shiftResponse);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteById(@PathVariable Long id) {
+        shiftService.deleteShift(id);
+        return ResponseEntity.ok("Shift deleted successfully");
     }
 }
