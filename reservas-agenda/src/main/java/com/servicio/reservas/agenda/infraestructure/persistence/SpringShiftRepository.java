@@ -16,12 +16,29 @@ public interface SpringShiftRepository extends JpaRepository<ShiftModel, Long> {
     AND s.date = :date
     AND (:startTime < s.timeEnd AND :endTime > s.timeStart)
 """)
-    boolean existsOverlappingReservation(
+    boolean existsOverlappingReservationCreate(
             @Param("barberId") Long barberId,
             @Param("date") LocalDate date,
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime
     );
+
+    @Query("""
+    SELECT CASE WHEN COUNT(s) > 0 THEN TRUE ELSE FALSE END
+    FROM ShiftModel s
+    WHERE s.barberId = :barberId
+    AND s.date = :date
+    AND (:startTime < s.timeEnd AND :endTime > s.timeStart)
+    AND s.id <> :id
+""")
+    boolean existsOverlappingReservationUpdate(
+            @Param("barberId") Long barberId,
+            @Param("date") LocalDate date,
+            @Param("startTime") LocalTime startTime,
+            @Param("endTime") LocalTime endTime,
+            @Param("id") Long id
+    );
+
 
     List<ShiftModel> findByBarberIdAndDate(Long barberId, LocalDate date);
 }

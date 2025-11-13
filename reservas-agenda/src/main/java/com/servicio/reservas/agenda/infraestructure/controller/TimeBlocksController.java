@@ -42,4 +42,11 @@ public class TimeBlocksController {
         shiftService.deleteShift(id);
         return ResponseEntity.ok("Shift deleted successfully");
     }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Shift> updateShift(
+            @PathVariable Long id,
+            @RequestBody RequestShift request) {
+        Shift updatedShift = shiftService.updateShift(id, request.getBarberId(), request.getDate(), request.getTimeStart(), request.getTimeEnd());
+        return ResponseEntity.ok(updatedShift);
+    }
 }

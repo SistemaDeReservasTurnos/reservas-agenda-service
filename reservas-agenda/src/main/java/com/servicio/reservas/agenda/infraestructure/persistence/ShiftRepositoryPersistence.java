@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Component
 public class ShiftRepositoryPersistence implements IShiftRepository {
@@ -21,8 +22,13 @@ public class ShiftRepositoryPersistence implements IShiftRepository {
     }
 
     @Override
-    public boolean existsOverlappingReservation(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        return springShiftRepository.existsOverlappingReservation(barberId, date, startTime, endTime);
+    public boolean existsOverlappingReservationUpdate(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime, Long id) {
+        return springShiftRepository.existsOverlappingReservationUpdate(barberId, date, startTime, endTime,id);
+    }
+
+    @Override
+    public boolean existsOverlappingReservationCreate(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        return springShiftRepository.existsOverlappingReservationCreate(barberId, date, startTime, endTime);
     }
 
     @Override
@@ -45,6 +51,11 @@ public class ShiftRepositoryPersistence implements IShiftRepository {
         ShiftModel model = springShiftRepository.findById(id)
                 .orElseThrow(() ->  new CustomException("Shift not found"));
         springShiftRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Shift> findById(Long id){
+        return springShiftRepository.findById(id).map(ShiftMapper::toDomain);
     }
 
 }
