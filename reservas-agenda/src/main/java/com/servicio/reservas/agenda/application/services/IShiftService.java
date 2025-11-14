@@ -17,4 +17,6 @@ public interface IShiftService {
     void deleteShift(Long id);
     Shift findById(Long id);
     Shift updateShift(Long id, Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime);
-}
+    void validateShift(Long barberId, Long serviceId, LocalDate date, LocalTime start, LocalTime end);
+
+    }
