@@ -18,7 +18,7 @@ public class RequestReservation {
     private Long serviceId;
     @NotNull(message = "The user ID is required")
     private Long userId;
-    @NotNull(message = "The id barber is required")
+    @NotNull(message = "The barber ID is required")
     private Long barberId;
     @NotNull(message = "The date is required")
     private LocalDate date;
