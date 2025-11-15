@@ -4,8 +4,6 @@ import com.servicio.reservas.agenda.application.dto.RequestReservation;
 import com.servicio.reservas.agenda.application.dto.ResponseReservation;
 
 public interface IReservationService {
-
     ResponseReservation createReservation(RequestReservation reservation);
 
-    //validar turno
 }

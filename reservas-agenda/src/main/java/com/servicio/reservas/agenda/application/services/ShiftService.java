@@ -1,6 +1,8 @@
 package com.servicio.reservas.agenda.application.services;
 
+import com.servicio.reservas.agenda.application.AvailabilityMode;
 import com.servicio.reservas.agenda.domain.TimeRange;
+import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
 import com.servicio.reservas.agenda.domain.repository.IShiftRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.CustomException;
@@ -54,38 +56,29 @@ public class ShiftService implements IShiftService {
     }
 
     @Override
-    public boolean validateAvailabilityBarberForUpdate(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime, Long shiftId) {
-        if (barberId == null) {
+    public boolean validateAvailabilityBarber(Reservation reservation, AvailabilityMode mode) {
+        if (reservation.getBarberId() == null) {
             throw new CustomException("The field barberId cannot be null");
         }
-        if (date == null) {
+        if (reservation.getDate() == null) {
             throw new CustomException("The field date cannot be null");
         }
-        if (startTime == null || endTime == null) {
+        if (reservation.getTimeStart() == null || reservation.getTimeEnd() == null) {
             throw new CustomException("Start time and end time must be provided");
         }
-        boolean existsOverlap = shiftRepository.existsOverlappingReservationUpdate(barberId, date, startTime, endTime, shiftId);
-        if (existsOverlap) {
-            throw new CustomException("The selected time overlaps with another shift");
+        if (mode == null) {
+            throw new CustomException("Availability mode cannot be null");
         }
-        return true;
-    }
 
-    @Override
-    public boolean validateAvailabilityBarber(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        if (barberId == null) {
-            throw new CustomException("The field barberId cannot be null");
-        }
-        if (date == null) {
-            throw new CustomException("The field date cannot be null");
-        }
-        if (startTime == null || endTime == null) {
-            throw new CustomException("Start time and end time must be provided");
-        }
-        boolean existsOverlap = shiftRepository.existsOverlappingReservationCreate(barberId, date, startTime, endTime);
+        boolean existsOverlap = switch (mode) {
+            case UPDATE -> shiftRepository.existsOverlappingReservationUpdate(reservation);
+            case CREATE -> shiftRepository.existsOverlappingReservationCreate(reservation);
+        };
+
         if (existsOverlap) {
             throw new CustomException("The selected time overlaps with another shift");
         }
+
         return true;
     }
 
@@ -99,12 +92,12 @@ public class ShiftService implements IShiftService {
     }
 
     @Override
-    public Shift createShift(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime){
+    public Shift createShift(Reservation reservation){
         Shift shift = new Shift();
-        shift.setBarberId(barberId);
-        shift.setDate(date);
-        shift.setTimeStart(startTime);
-        shift.setTimeEnd(endTime);
+        shift.setBarberId(reservation.getBarberId());
+        shift.setDate(reservation.getDate());
+        shift.setTimeStart(reservation.getTimeStart());
+        shift.setTimeEnd(reservation.getTimeEnd());
         return shiftRepository.save(shift);
     }
 
@@ -114,21 +107,21 @@ public class ShiftService implements IShiftService {
     }
 
     @Override
-    public void validateShift(Long barberId, Long serviceId, LocalDate date, LocalTime start, LocalTime end){
-        validateShiftDateTime(date, start);
-        validateWorkSchedule(start, end);
-        validationService(serviceId);
-        validateAvailabilityBarber(barberId, date, start, end);
+    public void validateShift(Reservation reservation){
+        validateShiftDateTime(reservation.getDate(), reservation.getTimeStart());
+        validateWorkSchedule(reservation.getTimeStart(), reservation.getTimeEnd());
+        validationService(reservation.getServiceId());
+        validateAvailabilityBarber(reservation,  AvailabilityMode.CREATE);
     }
 
     @Override
-    public Shift updateShift(Long id, Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        Shift existingShift = findById(id);
+    public Shift updateShift(Reservation reservation) {
+        Shift existingShift = findById(reservation.getId());
 
-        existingShift.setBarberId(barberId);
-        existingShift.setDate(date);
-        existingShift.setTimeStart(startTime);
-        existingShift.setTimeEnd(endTime);
+        existingShift.setBarberId(reservation.getBarberId());
+        existingShift.setDate(reservation.getDate());
+        existingShift.setTimeStart(reservation.getTimeStart());
+        existingShift.setTimeEnd(reservation.getTimeEnd());
 
         return shiftRepository.save(existingShift);
     }

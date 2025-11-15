@@ -1,6 +1,7 @@
 package com.servicio.reservas.agenda.infraestructure.persistence;
 
 
+import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
 import com.servicio.reservas.agenda.domain.repository.IShiftRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.CustomException;
@@ -22,13 +23,22 @@ public class ShiftRepositoryPersistence implements IShiftRepository {
     }
 
     @Override
-    public boolean existsOverlappingReservationUpdate(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime, Long id) {
-        return springShiftRepository.existsOverlappingReservationUpdate(barberId, date, startTime, endTime,id);
+    public boolean existsOverlappingReservationUpdate(Reservation reservation) {
+        return springShiftRepository.existsOverlappingReservationUpdate(
+                reservation.getBarberId(),
+                reservation.getDate(),
+                reservation.getTimeStart(),
+                reservation.getTimeEnd(),
+                reservation.getId());
     }
 
     @Override
-    public boolean existsOverlappingReservationCreate(Long barberId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        return springShiftRepository.existsOverlappingReservationCreate(barberId, date, startTime, endTime);
+    public boolean existsOverlappingReservationCreate(Reservation reservation) {
+        return springShiftRepository.existsOverlappingReservationCreate(
+                reservation.getBarberId(),
+                reservation.getDate(),
+                reservation.getTimeStart(),
+                reservation.getTimeEnd());
     }
 
     @Override
@@ -55,6 +65,7 @@ public class ShiftRepositoryPersistence implements IShiftRepository {
 
     @Override
     public Optional<Shift> findById(Long id){
+
         return springShiftRepository.findById(id).map(ShiftMapper::toDomain);
     }
 
