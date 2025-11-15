@@ -113,6 +113,7 @@ public class ShiftService implements IShiftService {
         shiftRepository.deleteById(id);
     }
 
+    @Override
     public void validateShift(Long barberId, Long serviceId, LocalDate date, LocalTime start, LocalTime end){
         validateShiftDateTime(date, start);
         validateWorkSchedule(start, end);
