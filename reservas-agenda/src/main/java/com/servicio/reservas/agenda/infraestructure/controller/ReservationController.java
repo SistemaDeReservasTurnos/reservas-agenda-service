@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.POST;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -25,6 +22,18 @@ public class ReservationController {
     public ResponseEntity<ResponseReservation> create(@Valid @RequestBody RequestReservation request) {
 
         ResponseReservation response = reservationService.createReservation(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<ResponseReservation>  edit(@PathVariable Long id, @Valid @RequestBody RequestReservation request) {
+        ResponseReservation response = reservationService.editReservation(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseReservation>  findReservationById(@PathVariable Long id) {
+        ResponseReservation response = reservationService.findReservationById(id);
         return ResponseEntity.ok(response);
     }
 }
