@@ -5,10 +5,12 @@ import com.servicio.reservas.agenda.application.dto.ReservationMapper;
 import com.servicio.reservas.agenda.application.dto.ResponseReservation;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
-import com.servicio.reservas.agenda.infraestructure.exception.ReservationsNoActiveException;
+import com.servicio.reservas.agenda.infraestructure.exception.ReservationsException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -51,7 +53,6 @@ public class ReservationService implements IReservationService {
 
         Reservation foundReservation = findReservationByIdInternal(id); //busco la reserva a editar
 
-
         //modifico la reserva si active == true
         if(foundReservation.getActive()){
 
@@ -70,10 +71,40 @@ public class ReservationService implements IReservationService {
             return ReservationMapper.toResponse(updatedR);
 
         }else {
-            throw new ReservationsNoActiveException(id);
+            throw new ReservationsException("The reservation ID " + id + " is deactivated.");
         }
 
         //validar que no haya una reserva a esa hora que voy a poner
+    }
+
+    @Override
+    public void cancelReservation(Long id) {
+
+        Reservation foundReservation = findReservationByIdInternal(id);
+
+        LocalDateTime reservationStartime = LocalDateTime.of(foundReservation.getDate(), foundReservation.getTimeStart());
+        LocalDateTime today = LocalDateTime.now(); //fecha y hora actual
+        LocalDateTime minimumHours = reservationStartime.minusHours(24);
+
+        if(today.isBefore(minimumHours)){
+
+            foundReservation.setStatus("CANCELED");
+            //foundReservation.setDate(LocalDate.now()); //modifico la fecha anterior por la fecha de la cancelacion
+            reservationRepository.save(foundReservation);
+
+        }else{
+            throw new ReservationsException("To cancel a reservation, you must give at least 24 hours' notice. ");
+        }
+    }
+
+    @Override
+    public void deactivateReservation(Long id) {
+
+        Reservation foundReservation = findReservationByIdInternal(id);
+        foundReservation.setActive(false);
+
+        reservationRepository.save(foundReservation);
+
     }
 
     @Override
@@ -81,8 +112,17 @@ public class ReservationService implements IReservationService {
         return ReservationMapper.toResponse(findReservationByIdInternal(id));
     }
 
+    @Override
+    public void deleteReservation(Long id) {
+        //eliminar reserva solo si esta status = cancelada o active = false
+        Reservation foundReservation = findReservationByIdInternal(id);
+
+        if(!foundReservation.getActive()){}
+
+    }
+
     private Reservation findReservationByIdInternal(Long id) {
         return reservationRepository.findByIdReservation(id)
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+                .orElseThrow(() -> new ReservationsException("Reservation not found"));
     }
 }

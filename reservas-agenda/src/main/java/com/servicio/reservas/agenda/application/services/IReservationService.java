@@ -8,5 +8,8 @@ public interface IReservationService {
     ResponseReservation createReservation(RequestReservation reservation);
     ResponseReservation editReservation(Long id, RequestReservation reservation);
     ResponseReservation findReservationById(Long id);
+    void deleteReservation(Long id);
+    void cancelReservation(Long id);
+    void deactivateReservation(Long id);
 
 }
