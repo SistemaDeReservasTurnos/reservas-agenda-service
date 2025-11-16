@@ -11,6 +11,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestShift{
+
     private Long barberId;
     private LocalDate date;
     private LocalTime timeStart;

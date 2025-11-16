@@ -1,7 +1,6 @@
 package com.servicio.reservas.agenda.domain.repository;
 
 import com.servicio.reservas.agenda.domain.entities.Reservation;
-import com.servicio.reservas.agenda.domain.entities.Shift;
 
 import java.util.Optional;
 

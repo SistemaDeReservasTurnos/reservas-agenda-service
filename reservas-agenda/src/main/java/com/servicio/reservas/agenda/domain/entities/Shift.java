@@ -11,6 +11,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Shift {
+
     private Long id;
     private Long barberId;
     private LocalDate date;

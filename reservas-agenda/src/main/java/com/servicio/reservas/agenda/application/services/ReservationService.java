@@ -28,23 +28,16 @@ public class ReservationService implements IReservationService {
     public ResponseReservation createReservation(RequestReservation reservation) {
 
         Optional<ServiceDTO> serviceDTO = shiftService.validationService(reservation.getServiceId());
-        Reservation reservation1 = new Reservation();
 
         LocalTime duration = serviceDTO.map(ServiceDTO::getDuration)
                 .orElseThrow(() -> new IllegalArgumentException("The service duration is empty"));
         LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour())
                 .plusMinutes(duration.getMinute());
-        reservation1.setServiceId(reservation.getServiceId());
-        reservation1.setUserId(reservation.getUserId());
-        reservation1.setDate(reservation.getDate());
-        reservation1.setBarberId(reservation.getBarberId());
-        reservation1.setTimeStart(reservation.getTimeStart());
-        reservation1.setTimeEnd(endTime);
-        //reservation1.setStatus();
-        //reservation1.setActive();
 
-        shiftService.validateShift(reservation.getBarberId(), reservation.getServiceId(), reservation.getDate(), reservation.getTimeStart(), endTime);
-        shiftService.createShift(reservation.getBarberId(), reservation.getDate(), reservation.getTimeStart(), endTime);
+        Reservation reservation1 = ReservationMapper.toDomain(reservation, endTime);
+
+        shiftService.validateShift(reservation1);
+        shiftService.createShift(reservation1);
 
         Reservation reservation2 = reservationRepository.save(reservation1);
 
@@ -68,7 +61,7 @@ public class ReservationService implements IReservationService {
             LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour()).plusMinutes(duration.getMinute());
 
             //valido el turno antes de modificar la reserva
-            shiftService.validateShift(reservation.getBarberId(), reservation.getServiceId(), reservation.getDate(), reservation.getTimeStart(), endTime);
+            shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime));
 
             //edito
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);
