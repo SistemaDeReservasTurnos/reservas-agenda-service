@@ -22,7 +22,7 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
     AND r.status NOT IN ('CANCELED', 'COMPLETED')
     AND (
         r.date < :today
-        OR (r.date = :today AND r.endTime <:now)
+        OR (r.date = :today AND r.endTime < :now)
         ) """)
     List<ReservationModel> findAllActiveThatEnded(
             @Param("now") LocalTime now,
