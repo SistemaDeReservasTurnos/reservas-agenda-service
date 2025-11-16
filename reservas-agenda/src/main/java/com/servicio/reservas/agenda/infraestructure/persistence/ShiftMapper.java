@@ -11,7 +11,8 @@ public class ShiftMapper {
         model.setDate(shift.getDate());
         model.setTimeStart(shift.getTimeStart());
         model.setTimeEnd(shift.getTimeEnd());
-        model.setState("reserved");
+        model.setReservationId(shift.getReservationId());
+        model.setState("RESERVED");
         return model;
     }
 
@@ -22,6 +23,7 @@ public class ShiftMapper {
                 model.getDate(),
                 model.getTimeStart(),
                 model.getTimeEnd(),
+                model.getReservationId(),
                 model.getState()
         );
     }

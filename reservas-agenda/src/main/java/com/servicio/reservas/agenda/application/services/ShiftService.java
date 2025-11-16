@@ -98,6 +98,7 @@ public class ShiftService implements IShiftService {
         shift.setDate(reservation.getDate());
         shift.setTimeStart(reservation.getTimeStart());
         shift.setTimeEnd(reservation.getTimeEnd());
+        shift.setReservationId(reservation.getId());
         return shiftRepository.save(shift);
     }
 
@@ -129,6 +130,11 @@ public class ShiftService implements IShiftService {
     public Shift findById(Long id) {
         return shiftRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Shift not found with id: " + id));
+    }
+
+    @Override
+    public void deleteShiftFromReservation(Long reservationId){
+        shiftRepository.deleteShiftFromReservation(reservationId);
     }
 
 

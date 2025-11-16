@@ -17,5 +17,6 @@ public class Shift {
     private LocalDate date;
     private LocalTime timeStart;
     private LocalTime timeEnd;
+    private Long reservationId;
     private String state;
 }
