@@ -39,9 +39,10 @@ public class ReservationService implements IReservationService {
         Reservation reservation1 = ReservationMapper.toDomain(reservation, endTime);
 
         shiftService.validateShift(reservation1);
-        shiftService.createShift(reservation1);
 
         Reservation reservation2 = reservationRepository.save(reservation1);
+
+        shiftService.createShift(reservation2);
 
         return ReservationMapper.toResponse(reservation2);
     }
@@ -89,8 +90,9 @@ public class ReservationService implements IReservationService {
         if(today.isBefore(minimumHours)){
 
             foundReservation.setStatus("CANCELED");
-            //foundReservation.setDate(LocalDate.now()); //modifico la fecha anterior por la fecha de la cancelacion
+            foundReservation.setActive(false);
             reservationRepository.save(foundReservation);
+            shiftService.deleteShiftFromReservation(id);
 
         }else{
             throw new ReservationsException("To cancel a reservation, you must give at least 24 hours' notice. ");
@@ -122,7 +124,13 @@ public class ReservationService implements IReservationService {
     }
 
     private Reservation findReservationByIdInternal(Long id) {
-        return reservationRepository.findByIdReservation(id)
+        Reservation reservation = reservationRepository.findByIdReservation(id)
                 .orElseThrow(() -> new ReservationsException("Reservation not found"));
+
+        if (!reservation.getActive()) {
+            throw new ReservationsException("The reservation ID " + id + " is deactivated.");
+        }
+
+        return reservation;
     }
 }

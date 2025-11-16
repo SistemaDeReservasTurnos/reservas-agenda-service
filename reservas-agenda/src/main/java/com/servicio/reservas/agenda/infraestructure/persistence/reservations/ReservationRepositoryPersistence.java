@@ -4,6 +4,9 @@ import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,5 +31,14 @@ public class ReservationRepositoryPersistence implements IReservationRepository 
 
         return springReservationRepository.findById(id).map(ReservationModelMapper::toDomain);
 
+    }
+
+    @Override
+    public List<Reservation> findAllActiveThatEnded(LocalTime now, LocalDate today){
+
+        List<ReservationModel> models = springReservationRepository.findAllActiveThatEnded(now, today);
+        return models.stream()
+                .map(ReservationModelMapper::toDomain)
+                .toList();
     }
 }

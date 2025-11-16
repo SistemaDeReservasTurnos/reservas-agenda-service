@@ -32,6 +32,9 @@ public class ReservationMapper {
         reservation.setTimeStart(request.getTimeStart());
         reservation.setTimeEnd(endTime);
 
+        reservation.setStatus("RESERVED");
+        reservation.setActive(true);
+
         return reservation;
     }
 }

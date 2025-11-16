@@ -28,6 +28,9 @@ public class ShiftModel {
     @Column(nullable = false)
     private LocalTime timeEnd;
 
+    @Column(nullable = false)
+    private Long reservationId;
+
     @Column(nullable = false, length = 50)
     private String state;
 }

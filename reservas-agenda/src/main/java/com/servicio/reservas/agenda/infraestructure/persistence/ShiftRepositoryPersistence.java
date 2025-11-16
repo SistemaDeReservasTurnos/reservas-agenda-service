@@ -69,4 +69,14 @@ public class ShiftRepositoryPersistence implements IShiftRepository {
         return springShiftRepository.findById(id).map(ShiftMapper::toDomain);
     }
 
+    @Override
+    public void updateStateShiftByReservationId(Long id){
+        springShiftRepository.updateStateShiftByReservationId(id);
+    }
+
+    @Override
+    public void deleteShiftFromReservation(Long id){
+        springShiftRepository.deleteShiftFromReservation(id);
+    }
+
 }

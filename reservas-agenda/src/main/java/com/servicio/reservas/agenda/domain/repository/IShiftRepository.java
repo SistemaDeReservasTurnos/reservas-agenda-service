@@ -3,7 +3,6 @@ package com.servicio.reservas.agenda.domain.repository;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,5 +13,7 @@ public interface IShiftRepository {
     Shift save(Shift shift);
     void deleteById(Long id);
     Optional<Shift> findById(Long id);
+    void updateStateShiftByReservationId(Long id);
+    void deleteShiftFromReservation(Long id);
 
 }

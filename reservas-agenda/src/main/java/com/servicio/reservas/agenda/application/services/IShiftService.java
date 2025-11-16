@@ -19,5 +19,6 @@ public interface IShiftService {
     Shift findById(Long id);
     Shift updateShift(Reservation reservation);
     void validateShift(Reservation reservation);
+    void deleteShiftFromReservation(Long reservationId);
 
 }
