@@ -23,4 +23,11 @@ public class Reservation {
     private String status;
     private Boolean active;
 
+    public void updateReservation(LocalDate date, LocalTime timeStart, LocalTime timeEnd) {
+        this.date = date;
+        this.timeStart = timeStart;
+        this.timeEnd = timeEnd;
+
+    }
+
 }
