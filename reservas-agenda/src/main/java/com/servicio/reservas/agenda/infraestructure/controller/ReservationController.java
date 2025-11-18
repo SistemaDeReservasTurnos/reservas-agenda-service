@@ -1,13 +1,18 @@
 package com.servicio.reservas.agenda.infraestructure.controller;
 
+import com.servicio.reservas.agenda.application.dto.FilterReservationUser;
 import com.servicio.reservas.agenda.application.dto.RequestReservation;
 import com.servicio.reservas.agenda.application.dto.ResponseReservation;
 import com.servicio.reservas.agenda.application.services.ReservationService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.POST;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -49,4 +54,29 @@ public class ReservationController {
         ResponseReservation response = reservationService.findReservationById(id);
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/user/{id}")
+    public List<ResponseReservation> getUserReservations(
+            @PathVariable("id") Long userId,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate,
+
+            @RequestParam(required = false) String status
+    ) {
+
+        FilterReservationUser filters = new FilterReservationUser();
+        filters.setUserId(userId);
+        filters.setStartDate(startDate);
+        filters.setEndDate(endDate);
+        filters.setStatus(status);
+
+        return reservationService.searchReservations(filters);
+    }
+
 }
+

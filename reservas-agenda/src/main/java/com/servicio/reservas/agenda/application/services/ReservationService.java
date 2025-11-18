@@ -1,5 +1,6 @@
 package com.servicio.reservas.agenda.application.services;
 
+import com.servicio.reservas.agenda.application.dto.FilterReservationUser;
 import com.servicio.reservas.agenda.application.dto.RequestReservation;
 import com.servicio.reservas.agenda.application.dto.ReservationMapper;
 import com.servicio.reservas.agenda.application.dto.ResponseReservation;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -110,6 +112,26 @@ public class ReservationService implements IReservationService {
     }
 
     @Override
+    public List<ResponseReservation> searchReservations(FilterReservationUser filters) {
+
+        // Llama al repository con los filtros ya organizados
+        List<Reservation> results = reservationRepository.userReservations(
+                filters.getUserId(),
+                filters.getStartDate(),
+                filters.getEndDate(),
+                filters.getStatus()
+        );
+
+        // Convertir a DTO
+        return results.stream()
+                .map(ReservationMapper::toResponse)
+                .toList();
+    }
+
+
+
+
+    @Override
     public ResponseReservation findReservationById(Long id) {
         return ReservationMapper.toResponse(findReservationByIdInternal(id));
     }
@@ -133,4 +155,6 @@ public class ReservationService implements IReservationService {
 
         return reservation;
     }
+
+
 }

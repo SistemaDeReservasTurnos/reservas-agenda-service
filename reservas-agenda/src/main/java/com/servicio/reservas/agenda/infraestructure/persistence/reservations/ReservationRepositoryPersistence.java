@@ -1,5 +1,6 @@
 package com.servicio.reservas.agenda.infraestructure.persistence.reservations;
 
+import com.servicio.reservas.agenda.application.dto.FilterReservationUser;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import org.springframework.stereotype.Repository;
@@ -12,33 +13,43 @@ import java.util.Optional;
 @Repository
 public class ReservationRepositoryPersistence implements IReservationRepository {
 
-    private final SpringReservationRepository  springReservationRepository;
+    private final SpringReservationRepository springReservationRepository;
+
     public ReservationRepositoryPersistence(SpringReservationRepository springReservationRepository) {
         this.springReservationRepository = springReservationRepository;
     }
 
-
     @Override
     public Reservation save(Reservation reservation) {
-
-        ReservationModel reservationModel = ReservationModelMapper.toModel(reservation);
-        ReservationModel savedReservationModel = springReservationRepository.save(reservationModel);
-        return ReservationModelMapper.toDomain(savedReservationModel);
+        ReservationModel model = ReservationModelMapper.toModel(reservation);
+        ReservationModel saved = springReservationRepository.save(model);
+        return ReservationModelMapper.toDomain(saved);
     }
 
     @Override
     public Optional<Reservation> findByIdReservation(Long id) {
-
-        return springReservationRepository.findById(id).map(ReservationModelMapper::toDomain);
-
+        return springReservationRepository.findById(id)
+                .map(ReservationModelMapper::toDomain);
     }
 
     @Override
-    public List<Reservation> findAllActiveThatEnded(LocalTime now, LocalDate today){
-
-        List<ReservationModel> models = springReservationRepository.findAllActiveThatEnded(now, today);
-        return models.stream()
+    public List<Reservation> findAllActiveThatEnded(LocalTime now, LocalDate today) {
+        return springReservationRepository.findAllActiveThatEnded(now, today)
+                .stream()
                 .map(ReservationModelMapper::toDomain)
                 .toList();
     }
-}
+
+    @Override
+    public List<Reservation> userReservations(Long userId, LocalDate startDate, LocalDate endDate, String status) {
+        return springReservationRepository.searchByFilters(
+                        userId,
+                        startDate,
+                        endDate,
+                        status
+                ).stream()
+                .map(ReservationModelMapper::toDomain)
+                .toList();
+
+
+}}
