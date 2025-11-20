@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservations")
+
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -68,11 +69,11 @@ public class ReservationController {
             @RequestParam(required = false) String status,
 
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+
             LocalDate startDate,
 
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+
             LocalDate endDate
     ) {
 
