@@ -28,7 +28,7 @@ public class TimeBlocksController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
 
         Reservation reservation = new Reservation();
-        reservation.setId(idBarber);
+        reservation.setBarberId(idBarber);
         reservation.setDate(date);
         reservation.setTimeStart(startTime);
         reservation.setTimeEnd(endTime);

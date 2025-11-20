@@ -1,13 +1,15 @@
 package com.servicio.reservas.agenda.infraestructure.controller;
 
-import com.servicio.reservas.agenda.application.dto.FilterReservationUser;
 import com.servicio.reservas.agenda.application.dto.RequestReservation;
 import com.servicio.reservas.agenda.application.dto.ResponseReservation;
 import com.servicio.reservas.agenda.application.services.ReservationService;
+import com.servicio.reservas.agenda.domain.entities.Reservation;
+import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
+import com.servicio.reservas.agenda.infraestructure.persistence.reservations.ReservationModel;
+import com.servicio.reservas.agenda.infraestructure.persistence.reservations.Specifications.SearchReservationUserSpecification;
+import com.servicio.reservas.agenda.infraestructure.persistence.reservations.SpringReservationRepository;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.POST;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +21,11 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    public ReservationController(ReservationService reservationService) {
+    private final SpringReservationRepository springReservationRepository;
+
+    public ReservationController(ReservationService reservationService, SpringReservationRepository  springReservationRepository) {
         this.reservationService = reservationService;
+        this.springReservationRepository = springReservationRepository;
     }
 
     @PostMapping("/create")
@@ -47,36 +52,19 @@ public class ReservationController {
         reservationService.deactivateReservation(id);
         return ResponseEntity.ok("desactivación exitosa");
     }
-    //@DeleteMapping("/delete/{id}")
+
+    @GetMapping("/search")
+    List<ReservationModel> getUserReservations(@RequestParam(required = false) Long userId, @RequestParam(required = false) LocalDate from, @RequestParam(required = false) LocalDate to, @RequestParam(required = false) String status) {
+
+        SearchReservationUserSpecification searchReservationUserSpecification = new SearchReservationUserSpecification(userId, from, to, status);
+
+        return springReservationRepository.findAll(searchReservationUserSpecification);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseReservation>  findReservationById(@PathVariable Long id) {
         ResponseReservation response = reservationService.findReservationById(id);
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/user/{id}")
-    public List<ResponseReservation> getUserReservations(
-            @PathVariable("id") Long userId,
-
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
-
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate,
-
-            @RequestParam(required = false) String status
-    ) {
-
-        FilterReservationUser filters = new FilterReservationUser();
-        filters.setUserId(userId);
-        filters.setStartDate(startDate);
-        filters.setEndDate(endDate);
-        filters.setStatus(status);
-
-        return reservationService.searchReservations(filters);
-    }
-
 }
 

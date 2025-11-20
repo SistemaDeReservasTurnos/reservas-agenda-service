@@ -1,6 +1,5 @@
 package com.servicio.reservas.agenda.application.services;
 
-import com.servicio.reservas.agenda.application.dto.FilterReservationUser;
 import com.servicio.reservas.agenda.application.dto.RequestReservation;
 import com.servicio.reservas.agenda.application.dto.ReservationMapper;
 import com.servicio.reservas.agenda.application.dto.ResponseReservation;
@@ -10,7 +9,6 @@ import com.servicio.reservas.agenda.infraestructure.exception.ReservationsExcept
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -106,43 +104,15 @@ public class ReservationService implements IReservationService {
 
         Reservation foundReservation = findReservationByIdInternal(id);
         foundReservation.setActive(false);
+        foundReservation.setStatus("DEACTIVATED");
 
         reservationRepository.save(foundReservation);
 
     }
 
     @Override
-    public List<ResponseReservation> searchReservations(FilterReservationUser filters) {
-
-        // Llama al repository con los filtros ya organizados
-        List<Reservation> results = reservationRepository.userReservations(
-                filters.getUserId(),
-                filters.getStartDate(),
-                filters.getEndDate(),
-                filters.getStatus()
-        );
-
-        // Convertir a DTO
-        return results.stream()
-                .map(ReservationMapper::toResponse)
-                .toList();
-    }
-
-
-
-
-    @Override
     public ResponseReservation findReservationById(Long id) {
         return ReservationMapper.toResponse(findReservationByIdInternal(id));
-    }
-
-    @Override
-    public void deleteReservation(Long id) {
-        //eliminar reserva solo si esta status = cancelada o active = false
-        Reservation foundReservation = findReservationByIdInternal(id);
-
-        if(!foundReservation.getActive()){}
-
     }
 
     private Reservation findReservationByIdInternal(Long id) {
