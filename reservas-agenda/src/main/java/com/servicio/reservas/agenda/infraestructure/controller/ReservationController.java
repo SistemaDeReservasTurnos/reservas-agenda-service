@@ -45,7 +45,7 @@ public class ReservationController {
         return ResponseEntity.ok("Cancelación exitosa");
     }
 
-    @PutMapping("/deactivate/{id}")
+    @PutMapping("/desactivate/{id}")
     public ResponseEntity<String> deactivateReservation(@PathVariable Long id) {
         reservationService.deactivateReservation(id);
         return ResponseEntity.ok("Desactivación exitosa");
@@ -62,7 +62,6 @@ public class ReservationController {
     @GetMapping("/admin")
     public ResponseEntity<List<ResponseReservation>> getAllReservationsAdmin(
 
-            @RequestHeader("X-ROLE") String role,
 
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long serviceId,
@@ -77,10 +76,7 @@ public class ReservationController {
             LocalDate endDate
     ) {
 
-        // 🔐 Validación de rol
-        if (!"ADMIN".equalsIgnoreCase(role)) {
-            throw new RuntimeException("Unauthorized: Only admins can access this endpoint.");
-        }
+
 
         // Crear DTO de filtros
         FilterReservationAdmin filters = new FilterReservationAdmin();
