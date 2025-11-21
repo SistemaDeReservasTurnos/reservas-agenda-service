@@ -1,6 +1,7 @@
 package com.servicio.reservas.agenda.application.services;
 
-import com.servicio.reservas.agenda.application.dto.FilterReservationUser;
+import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationAdmin;
+import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationUser;
 import com.servicio.reservas.agenda.application.dto.RequestReservation;
 import com.servicio.reservas.agenda.application.dto.ReservationMapper;
 import com.servicio.reservas.agenda.application.dto.ResponseReservation;
@@ -9,8 +10,6 @@ import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.ReservationsException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -106,13 +105,13 @@ public class ReservationService implements IReservationService {
 
         Reservation foundReservation = findReservationByIdInternal(id);
         foundReservation.setActive(false);
-
+        foundReservation.setStatus("DEACTIVATED");
         reservationRepository.save(foundReservation);
 
     }
 
     @Override
-    public List<ResponseReservation> searchReservations(FilterReservationUser filters) {
+    public List<ResponseReservation> searchReservationsUser(FilterReservationUser filters) {
 
         // Llama al repository con los filtros ya organizados
         List<Reservation> results = reservationRepository.userReservations(
@@ -128,21 +127,15 @@ public class ReservationService implements IReservationService {
                 .toList();
     }
 
-
-
+    @Override
+    public List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters) {
+        List<Reservation> list = reservationRepository.adminSearchReservations(filters);
+        return list.stream().map(ReservationMapper::toResponse).toList();
+    }
 
     @Override
     public ResponseReservation findReservationById(Long id) {
         return ReservationMapper.toResponse(findReservationByIdInternal(id));
-    }
-
-    @Override
-    public void deleteReservation(Long id) {
-        //eliminar reserva solo si esta status = cancelada o active = false
-        Reservation foundReservation = findReservationByIdInternal(id);
-
-        if(!foundReservation.getActive()){}
-
     }
 
     private Reservation findReservationByIdInternal(Long id) {
@@ -152,9 +145,7 @@ public class ReservationService implements IReservationService {
         if (!reservation.getActive()) {
             throw new ReservationsException("The reservation ID " + id + " is deactivated.");
         }
-
         return reservation;
     }
-
 
 }

@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.application.dto;
+package com.servicio.reservas.agenda.application.dto.reservationsFilters;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +22,5 @@ public class FilterReservationUser {
         this.endDate = endDate;
         this.status = status;
     }
-
 }
 

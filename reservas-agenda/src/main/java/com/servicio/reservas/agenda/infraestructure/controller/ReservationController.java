@@ -1,16 +1,14 @@
 package com.servicio.reservas.agenda.infraestructure.controller;
 
-import com.servicio.reservas.agenda.application.dto.FilterReservationUser;
+import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationAdmin;
+import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationUser;
 import com.servicio.reservas.agenda.application.dto.RequestReservation;
 import com.servicio.reservas.agenda.application.dto.ResponseReservation;
 import com.servicio.reservas.agenda.application.services.ReservationService;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.POST;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -39,35 +37,38 @@ public class ReservationController {
     @PutMapping("/cancel/{id}")
     public ResponseEntity<String>  cancelReservation(@PathVariable Long id) {
         reservationService.cancelReservation(id);
-        return ResponseEntity.ok("cancelación exitosa");
+        return ResponseEntity.ok("Successful Cancellation");
     }
 
     @PutMapping("/deactivate/{id}")
     public ResponseEntity<String>  deactivateReservation(@PathVariable Long id) {
         reservationService.deactivateReservation(id);
-        return ResponseEntity.ok("desactivación exitosa");
+        return ResponseEntity.ok("Successful Deactivation");
     }
-    //@DeleteMapping("/delete/{id}")
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseReservation>  findReservationById(@PathVariable Long id) {
         ResponseReservation response = reservationService.findReservationById(id);
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/user/{id}")
+
+    @GetMapping("/user")
     public List<ResponseReservation> getUserReservations(
-            @PathVariable("id") Long userId,
+
+            //@PathVariable("id") Long userId,
+            @RequestParam Long userId,
 
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
 
             @RequestParam(required = false) String status
     ) {
+        if(userId == null){
+            throw new IllegalArgumentException("User can't be null");
+        }
 
         FilterReservationUser filters = new FilterReservationUser();
         filters.setUserId(userId);
@@ -75,8 +76,33 @@ public class ReservationController {
         filters.setEndDate(endDate);
         filters.setStatus(status);
 
-        return reservationService.searchReservations(filters);
+        return reservationService.searchReservationsUser(filters);
     }
+    @GetMapping("/admin")
+    public ResponseEntity<List<ResponseReservation>> getAllReservationsAdmin(
 
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long serviceId,
+            @RequestParam(required = false) String status,
+
+            @RequestParam(required = false)
+            LocalDate startDate,
+
+            @RequestParam(required = false)
+            LocalDate endDate
+    ) {
+        // Crear DTO de filtros
+        FilterReservationAdmin filters = new FilterReservationAdmin();
+        filters.setUserId(userId);
+        filters.setServiceId(serviceId);
+        filters.setStatus(status);
+        filters.setStartDate(startDate);
+        filters.setEndDate(endDate);
+
+        // Llamar al service
+        List<ResponseReservation> result = reservationService.searchAllReservationsAdmin(filters);
+
+        return ResponseEntity.ok(result);
+    }
 }
 

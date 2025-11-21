@@ -1,10 +1,9 @@
 package com.servicio.reservas.agenda.infraestructure.persistence.reservations;
 
-import com.servicio.reservas.agenda.application.dto.FilterReservationUser;
+import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationAdmin;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -42,14 +41,23 @@ public class ReservationRepositoryPersistence implements IReservationRepository 
 
     @Override
     public List<Reservation> userReservations(Long userId, LocalDate startDate, LocalDate endDate, String status) {
-        return springReservationRepository.searchByFilters(
-                        userId,
-                        startDate,
-                        endDate,
-                        status
-                ).stream()
+        return springReservationRepository.searchByFilters(userId, startDate, endDate, status)
+                .stream()
                 .map(ReservationModelMapper::toDomain)
                 .toList();
+    }
 
+    @Override
+    public List<Reservation> adminSearchReservations(FilterReservationAdmin filters) {
 
-}}
+        List<ReservationModel> result =
+                springReservationRepository.searchAdminFilters(
+                        filters.getUserId(),
+                        filters.getServiceId(),
+                        filters.getStatus(),
+                        filters.getStartDate(),
+                        filters.getEndDate());
+
+        return result.stream().map(ReservationModelMapper::toDomain).toList();
+    }
+}
