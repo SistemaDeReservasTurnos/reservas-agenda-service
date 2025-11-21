@@ -32,11 +32,12 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
 
     @Query("""
     SELECT r FROM reservation r
-    WHERE r.userId = :userId
-    AND (:startDate IS NULL OR r.date >= :startDate)
-    AND (:endDate IS NULL OR r.date <= :endDate)
+    WHERE (:userId IS NULL OR r.userId = :userId)
+    AND (:serviceId IS NULL OR r.serviceId = :serviceId)
     AND (:status IS NULL OR r.status = :status)
-    ORDER BY r.date DESC
+    AND (COALESCE(:startDate, r.date) <= r.date)
+    AND (COALESCE(:endDate, r.date) >= r.date)
+    ORDER BY r.date DESC, r.startTime DESC
 """)
     List<ReservationModel> searchByFilters(
             @Param("userId") Long userId,
@@ -44,4 +45,5 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
             @Param("endDate") LocalDate endDate,
             @Param("status") String status
     );
-    }
+
+}
