@@ -1,8 +1,8 @@
 package com.servicio.reservas.agenda.infraestructure.controller;
 
 import com.servicio.reservas.agenda.application.AvailabilityMode;
-import com.servicio.reservas.agenda.application.dto.RequestShift;
-import com.servicio.reservas.agenda.application.services.ShiftService;
+import com.servicio.reservas.agenda.application.dto.shifts.RequestShift;
+import com.servicio.reservas.agenda.application.services.shifts.ShiftService;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
 import lombok.RequiredArgsConstructor;

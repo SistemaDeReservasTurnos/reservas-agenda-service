@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IShiftRepository {
+
     List<Shift> findByBarberAndDate(Long barberId, LocalDate date);
     boolean existsOverlappingReservationUpdate(Reservation reservation);
     boolean existsOverlappingReservationCreate(Reservation reservation);

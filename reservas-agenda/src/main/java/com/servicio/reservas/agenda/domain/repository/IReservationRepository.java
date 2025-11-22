@@ -1,6 +1,6 @@
 package com.servicio.reservas.agenda.domain.repository;
 
-import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationAdmin;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,5 +14,6 @@ public interface IReservationRepository {
     List<Reservation> findAllActiveThatEnded(LocalTime now, LocalDate today);
     List<Reservation> userReservations(Long userId, LocalDate startDate, LocalDate endDate, String status); // metodo nuevo
     List<Reservation> adminSearchReservations(FilterReservationAdmin filters);
+
 }
 

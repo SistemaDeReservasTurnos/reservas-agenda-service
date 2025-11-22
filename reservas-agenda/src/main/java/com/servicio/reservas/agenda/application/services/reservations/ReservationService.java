@@ -1,10 +1,12 @@
-package com.servicio.reservas.agenda.application.services;
+package com.servicio.reservas.agenda.application.services.reservations;
 
-import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationAdmin;
-import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationUser;
-import com.servicio.reservas.agenda.application.dto.RequestReservation;
-import com.servicio.reservas.agenda.application.dto.ReservationMapper;
-import com.servicio.reservas.agenda.application.dto.ResponseReservation;
+import com.servicio.reservas.agenda.application.AvailabilityMode;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationUser;
+import com.servicio.reservas.agenda.application.dto.reservations.RequestReservation;
+import com.servicio.reservas.agenda.application.dto.reservations.ReservationMapper;
+import com.servicio.reservas.agenda.application.dto.reservations.ResponseReservation;
+import com.servicio.reservas.agenda.application.services.shifts.IShiftService;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.ReservationsException;
@@ -37,11 +39,11 @@ public class ReservationService implements IReservationService {
         LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour())
                 .plusMinutes(duration.getMinute());
 
-        Reservation reservation1 = ReservationMapper.toDomain(reservation, endTime);
+        Reservation newReservation = ReservationMapper.toDomain(reservation, endTime);
 
-        shiftService.validateShift(reservation1);
+        shiftService.validateShift(newReservation, AvailabilityMode.CREATE);
 
-        Reservation reservation2 = reservationRepository.save(reservation1);
+        Reservation reservation2 = reservationRepository.save(newReservation);
 
         shiftService.createShift(reservation2);
 
@@ -64,7 +66,7 @@ public class ReservationService implements IReservationService {
             LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour()).plusMinutes(duration.getMinute());
 
             //valido el turno antes de modificar la reserva
-            shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime));
+            shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime),  AvailabilityMode.UPDATE);
 
             //edito
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);
@@ -76,7 +78,6 @@ public class ReservationService implements IReservationService {
             throw new ReservationsException("The reservation ID " + id + " is deactivated.");
         }
 
-        //validar que no haya una reserva a esa hora que voy a poner
     }
 
     @Override
@@ -106,7 +107,9 @@ public class ReservationService implements IReservationService {
         Reservation foundReservation = findReservationByIdInternal(id);
         foundReservation.setActive(false);
         foundReservation.setStatus("DEACTIVATED");
+
         reservationRepository.save(foundReservation);
+        shiftService.deleteShiftFromReservation(id);
 
     }
 
@@ -120,6 +123,7 @@ public class ReservationService implements IReservationService {
                 filters.getEndDate(),
                 filters.getStatus()
         );
+        if(results.isEmpty()){ throw new ReservationsException("No reservations found.");}
 
         // Convertir a DTO
         return results.stream()
@@ -129,16 +133,22 @@ public class ReservationService implements IReservationService {
 
     @Override
     public List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters) {
+
         List<Reservation> list = reservationRepository.adminSearchReservations(filters);
+
+        if(list.isEmpty()){ throw new ReservationsException("No reservations found.");}
+
         return list.stream().map(ReservationMapper::toResponse).toList();
     }
 
     @Override
     public ResponseReservation findReservationById(Long id) {
+
         return ReservationMapper.toResponse(findReservationByIdInternal(id));
     }
 
     private Reservation findReservationByIdInternal(Long id) {
+
         Reservation reservation = reservationRepository.findByIdReservation(id)
                 .orElseThrow(() -> new ReservationsException("Reservation not found"));
 

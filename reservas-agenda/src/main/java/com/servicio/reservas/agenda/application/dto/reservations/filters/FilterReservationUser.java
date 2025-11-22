@@ -1,12 +1,12 @@
-package com.servicio.reservas.agenda.application.dto.reservationsFilters;
+package com.servicio.reservas.agenda.application.dto.reservations.filters;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
 @Setter
 @Getter
+
 public class FilterReservationUser {
 
     private Long userId;

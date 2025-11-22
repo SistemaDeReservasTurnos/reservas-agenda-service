@@ -1,10 +1,10 @@
 package com.servicio.reservas.agenda.infraestructure.controller;
 
-import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationAdmin;
-import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationUser;
-import com.servicio.reservas.agenda.application.dto.RequestReservation;
-import com.servicio.reservas.agenda.application.dto.ResponseReservation;
-import com.servicio.reservas.agenda.application.services.ReservationService;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationUser;
+import com.servicio.reservas.agenda.application.dto.reservations.RequestReservation;
+import com.servicio.reservas.agenda.application.dto.reservations.ResponseReservation;
+import com.servicio.reservas.agenda.application.services.reservations.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +52,9 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/user")
+    @GetMapping("/search-user")
     public List<ResponseReservation> getUserReservations(
 
-            //@PathVariable("id") Long userId,
             @RequestParam Long userId,
 
             @RequestParam(required = false)
@@ -74,11 +73,11 @@ public class ReservationController {
         filters.setUserId(userId);
         filters.setStartDate(startDate);
         filters.setEndDate(endDate);
-        filters.setStatus(status);
+        filters.setStatus(status != null ? status.toUpperCase() : null);
 
         return reservationService.searchReservationsUser(filters);
     }
-    @GetMapping("/admin")
+    @GetMapping("/search-admin")
     public ResponseEntity<List<ResponseReservation>> getAllReservationsAdmin(
 
             @RequestParam(required = false) Long userId,
@@ -95,14 +94,15 @@ public class ReservationController {
         FilterReservationAdmin filters = new FilterReservationAdmin();
         filters.setUserId(userId);
         filters.setServiceId(serviceId);
-        filters.setStatus(status);
         filters.setStartDate(startDate);
         filters.setEndDate(endDate);
+        filters.setStatus(status != null ? status.toUpperCase() : null);
 
         // Llamar al service
         List<ResponseReservation> result = reservationService.searchAllReservationsAdmin(filters);
 
         return ResponseEntity.ok(result);
     }
+
 }
 

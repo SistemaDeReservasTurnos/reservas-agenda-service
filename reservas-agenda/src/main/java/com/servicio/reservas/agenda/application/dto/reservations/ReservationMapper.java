@@ -1,7 +1,6 @@
-package com.servicio.reservas.agenda.application.dto;
+package com.servicio.reservas.agenda.application.dto.reservations;
 
 import com.servicio.reservas.agenda.domain.entities.Reservation;
-
 import java.time.LocalTime;
 
 public class ReservationMapper {
@@ -24,7 +23,9 @@ public class ReservationMapper {
     }
 
     public static Reservation toDomain(RequestReservation request, LocalTime endTime){
+
         Reservation reservation = new Reservation();
+
         reservation.setServiceId(request.getServiceId());
         reservation.setUserId(request.getUserId());
         reservation.setBarberId(request.getBarberId());

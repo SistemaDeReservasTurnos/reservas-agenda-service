@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.application.dto.reservationsFilters;
+package com.servicio.reservas.agenda.application.dto.reservations.filters;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +11,8 @@ public class FilterReservationAdmin {
 
     private Long userId;
     private Long serviceId;
-    private String status;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String status;
+
 }

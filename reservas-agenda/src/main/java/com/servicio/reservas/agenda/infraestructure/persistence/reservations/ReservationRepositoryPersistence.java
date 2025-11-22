@@ -1,6 +1,6 @@
 package com.servicio.reservas.agenda.infraestructure.persistence.reservations;
 
-import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationAdmin;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import org.springframework.stereotype.Repository;
@@ -54,9 +54,9 @@ public class ReservationRepositoryPersistence implements IReservationRepository 
                 springReservationRepository.searchAdminFilters(
                         filters.getUserId(),
                         filters.getServiceId(),
-                        filters.getStatus(),
                         filters.getStartDate(),
-                        filters.getEndDate());
+                        filters.getEndDate(),
+                        filters.getStatus());
 
         return result.stream().map(ReservationModelMapper::toDomain).toList();
     }

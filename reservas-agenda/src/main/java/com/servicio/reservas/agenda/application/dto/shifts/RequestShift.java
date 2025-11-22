@@ -1,9 +1,8 @@
-package com.servicio.reservas.agenda.application.dto;
+package com.servicio.reservas.agenda.application.dto.shifts;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -11,16 +10,11 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class ResponseReservation {
+public class RequestShift{
 
-    private Long id;
-    private Long serviceId;
-    private Long userId;
     private Long barberId;
     private LocalDate date;
     private LocalTime timeStart;
     private LocalTime timeEnd;
-    private String status;
-    private Boolean active;
 
 }

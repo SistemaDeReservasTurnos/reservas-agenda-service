@@ -1,12 +1,13 @@
-package com.servicio.reservas.agenda.application.services;
+package com.servicio.reservas.agenda.application.services.reservations;
 
-import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationAdmin;
-import com.servicio.reservas.agenda.application.dto.reservationsFilters.FilterReservationUser;
-import com.servicio.reservas.agenda.application.dto.RequestReservation;
-import com.servicio.reservas.agenda.application.dto.ResponseReservation;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationUser;
+import com.servicio.reservas.agenda.application.dto.reservations.RequestReservation;
+import com.servicio.reservas.agenda.application.dto.reservations.ResponseReservation;
 import java.util.List;
 
 public interface IReservationService {
+
     ResponseReservation createReservation(RequestReservation reservation);
     ResponseReservation editReservation(Long id, RequestReservation reservation);
     ResponseReservation findReservationById(Long id);
@@ -14,6 +15,5 @@ public interface IReservationService {
     void deactivateReservation(Long id);
     List<ResponseReservation> searchReservationsUser( FilterReservationUser filters);
     List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters);
-
 
 }

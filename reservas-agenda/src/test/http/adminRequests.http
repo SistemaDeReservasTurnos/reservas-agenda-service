@@ -1,0 +1,35 @@
+### Listar todas las reservas
+GET http://localhost:8083/api/reservations/search-admin?
+
+### Buscar reservas por usuario
+GET http://localhost:8083/api/reservations/search-admin?userId=17
+
+### Buscar reservas por servicio
+GET http://localhost:8083/api/reservations/search-admin?serviceId=1
+
+### Buscar con rango de fechas
+GET http://localhost:8083/api/reservations/search-admin?startDate=2025-11-16&endDate=2025-11-18
+
+### Buscar por estado (reserved, completed, canceled, deactivated)
+GET http://localhost:8083/api/reservations/search-admin?status=reserved
+
+### Buscar por usuario y servicio
+GET http://localhost:8083/api/reservations/search-admin?userId=1&serviceId=1
+
+### Buscar por usuario y rango de fechas
+GET http://localhost:8083/api/reservations/search-admin?userId=18&startDate=2025-11-16&endDate=2025-11-18
+
+### Buscar por usuario y estado
+GET http://localhost:8083/api/reservations/search-admin?userId=1&status=reserved
+
+### Buscar por rango de fecha y estado
+GET http://localhost:8083/api/reservations/search-admin?startDate=2025-11-16&endDate=2025-11-22&status=reserved
+
+### Buscar por servicio y rango de fechas
+GET http://localhost:8083/api/reservations/search-admin?serviceId=1&startDate=2025-11-16&endDate=2025-11-22
+
+### Buscar por servicio y estado
+GET http://localhost:8083/api/reservations/search-admin?serviceId=1&status=reserved
+
+### Buscar por todos los filtros (usuario, servicio, rango de fechas y estado)
+GET http://localhost:8083/api/reservations/search-admin?userId=1&startDate=2025-11-16&endDate=2025-11-22&status=reserved

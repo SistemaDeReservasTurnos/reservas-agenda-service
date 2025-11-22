@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.persistence;
+package com.servicio.reservas.agenda.infraestructure.persistence.shifts;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,12 +18,14 @@ public interface SpringShiftRepository extends JpaRepository<ShiftModel, Long> {
     WHERE s.barberId = :barberId
     AND s.date = :date
     AND (:startTime < s.timeEnd AND :endTime > s.timeStart)
+    
 """)
     boolean existsOverlappingReservationCreate(
             @Param("barberId") Long barberId,
             @Param("date") LocalDate date,
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime
+
     );
 
     @Query("""
@@ -40,6 +42,7 @@ public interface SpringShiftRepository extends JpaRepository<ShiftModel, Long> {
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime,
             @Param("id") Long id
+
     );
 
     List<ShiftModel> findByBarberIdAndDate(Long barberId, LocalDate date);
