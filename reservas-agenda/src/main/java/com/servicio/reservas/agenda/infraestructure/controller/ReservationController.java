@@ -81,10 +81,10 @@ public class ReservationController {
             @RequestParam(required = false) String status,
 
             @RequestParam(required = false)
-            LocalDate startDate,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 
             @RequestParam(required = false)
-            LocalDate endDate
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         // Crear DTO de filtros
         FilterReservationAdmin filters = new FilterReservationAdmin();
