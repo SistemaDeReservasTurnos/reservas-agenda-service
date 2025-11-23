@@ -55,7 +55,7 @@ public class ReservationController {
     @GetMapping("/search-user")
     public List<ResponseReservation> getUserReservations(
 
-            @RequestParam Long userId,
+            @RequestParam(required = true) Long userId,
 
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
