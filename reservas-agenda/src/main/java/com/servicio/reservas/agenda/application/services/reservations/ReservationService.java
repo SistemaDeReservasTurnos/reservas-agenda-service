@@ -129,21 +129,15 @@ public class ReservationService implements IReservationService {
                 filters.getEndDate(),
                 filters.getStatus()
         );
-        if(results.isEmpty()){ throw new ReservationsException("No reservations found.");}
 
         // Convertir a DTO
-        return results.stream()
-                .map(ReservationMapper::toResponse)
-                .toList();
+        return results.stream().map(ReservationMapper::toResponse).toList();
     }
 
     @Override
     public List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters) {
 
         List<Reservation> list = reservationRepository.adminSearchReservations(filters);
-
-        if(list.isEmpty()){ throw new ReservationsException("No reservations found.");}
-
         return list.stream().map(ReservationMapper::toResponse).toList();
     }
 

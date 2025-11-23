@@ -7,8 +7,11 @@ import com.servicio.reservas.agenda.application.dto.reservations.ResponseReserva
 import com.servicio.reservas.agenda.application.services.reservations.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -53,9 +56,9 @@ public class ReservationController {
     }
 
     @GetMapping("/search-user")
-    public List<ResponseReservation> getUserReservations(
+    public ResponseEntity<List<ResponseReservation>>  getUserReservations(
 
-            @RequestParam(required = true) Long userId,
+            @RequestParam Long userId,
 
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -65,13 +68,18 @@ public class ReservationController {
 
             @RequestParam(required = false) String status
     ) {
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de inicio debe ser anterior o igual a la fecha de fin.");
+        }
+
         FilterReservationUser filters = new FilterReservationUser();
         filters.setUserId(userId);
         filters.setStartDate(startDate);
         filters.setEndDate(endDate);
         filters.setStatus(status != null ? status.toUpperCase() : null);
 
-        return reservationService.searchReservationsUser(filters);
+        List<ResponseReservation> result = reservationService.searchReservationsUser(filters);
+        return ResponseEntity.ok(result);
     }
     @GetMapping("/search-admin")
     public ResponseEntity<List<ResponseReservation>> getAllReservationsAdmin(
@@ -81,12 +89,15 @@ public class ReservationController {
             @RequestParam(required = false) String status,
 
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            LocalDate startDate,
 
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+            LocalDate endDate
     ) {
-        // Create filter DTO
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de inicio debe ser anterior o igual a la fecha de fin.");
+        }
+        // Crear DTO de filtros
         FilterReservationAdmin filters = new FilterReservationAdmin();
         filters.setUserId(userId);
         filters.setServiceId(serviceId);
@@ -94,9 +105,8 @@ public class ReservationController {
         filters.setEndDate(endDate);
         filters.setStatus(status != null ? status.toUpperCase() : null);
 
-        // Call the service
+        // Llamar al service
         List<ResponseReservation> result = reservationService.searchAllReservationsAdmin(filters);
-
         return ResponseEntity.ok(result);
     }
 
