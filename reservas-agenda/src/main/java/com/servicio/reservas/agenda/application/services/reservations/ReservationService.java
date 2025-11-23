@@ -39,7 +39,10 @@ public class ReservationService implements IReservationService {
         LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour())
                 .plusMinutes(duration.getMinute());
 
-        Reservation newReservation = ReservationMapper.toDomain(reservation, endTime);
+        Double amount = serviceDTO.map(ServiceDTO::getPrice)
+                .orElseThrow(() -> new IllegalArgumentException("The price is empty"));
+
+        Reservation newReservation = ReservationMapper.toDomain(reservation, endTime, amount);
 
         shiftService.validateShift(newReservation, AvailabilityMode.CREATE);
 
@@ -65,8 +68,11 @@ public class ReservationService implements IReservationService {
 
             LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour()).plusMinutes(duration.getMinute());
 
+            Double amount = serviceDTO.map(ServiceDTO::getPrice)
+                    .orElseThrow(() -> new IllegalArgumentException("The price is empty"));
+
             //valido el turno antes de modificar la reserva
-            shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime),  AvailabilityMode.UPDATE);
+            shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime, amount),  AvailabilityMode.UPDATE);
 
             //edito
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);

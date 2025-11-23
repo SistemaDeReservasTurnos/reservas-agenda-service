@@ -23,7 +23,7 @@ public class ReservationMapper {
         return responseReservation;
     }
 
-    public static Reservation toDomain(RequestReservation request, LocalTime endTime){
+    public static Reservation toDomain(RequestReservation request, LocalTime endTime, Double amount) {
 
         Reservation reservation = new Reservation();
 
@@ -36,8 +36,7 @@ public class ReservationMapper {
 
         reservation.setStatus("RESERVED");
         reservation.setActive(true);
-        reservation.setAmount(request.getAmount());
-
+        reservation.setAmount(amount);
         return reservation;
     }
 }

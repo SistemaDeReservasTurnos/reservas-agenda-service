@@ -23,6 +23,4 @@ public class RequestReservation {
     private LocalDate date;
     @NotNull(message = "The time start is required")
     private LocalTime timeStart;
-    @NotNull(message = "The amount is required")
-    private Double amount;
 }
