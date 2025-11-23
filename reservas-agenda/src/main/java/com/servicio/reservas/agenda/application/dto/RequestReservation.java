@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -18,6 +19,8 @@ public class RequestReservation {
     private Long serviceId;
     @NotNull(message = "The user ID is required")
     private Long userId;
+    @NotNull(message = "The amount is required")
+    private Double amount;
     @NotNull(message = "The barber ID is required")
     private Long barberId;
     @NotNull(message = "The date is required")

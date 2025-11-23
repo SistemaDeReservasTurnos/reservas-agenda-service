@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -25,6 +26,9 @@ public class ReservationModel {
 
     @Column
     private Long barberId;
+
+    @Column
+    private Double amount;
 
     @Column
     private LocalDate date;

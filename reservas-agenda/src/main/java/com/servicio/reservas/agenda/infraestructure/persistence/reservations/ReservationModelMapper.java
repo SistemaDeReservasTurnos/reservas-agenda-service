@@ -11,6 +11,7 @@ public class ReservationModelMapper {
         reservationModel.setServiceId(reservation.getServiceId());
         reservationModel.setUserId(reservation.getUserId());
         reservationModel.setBarberId(reservation.getBarberId());
+        reservationModel.setAmount(reservation.getAmount());
         reservationModel.setDate(reservation.getDate());
         reservationModel.setStartTime(reservation.getTimeStart());
         reservationModel.setEndTime(reservation.getTimeEnd());
@@ -28,6 +29,7 @@ public class ReservationModelMapper {
         reservation.setServiceId(reservationModel.getServiceId());
         reservation.setUserId(reservationModel.getUserId());
         reservation.setBarberId(reservationModel.getBarberId());
+        reservation.setAmount(reservationModel.getAmount());
         reservation.setDate(reservationModel.getDate());
         reservation.setTimeStart(reservationModel.getStartTime());
         reservation.setTimeEnd(reservationModel.getEndTime());

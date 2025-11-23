@@ -14,6 +14,7 @@ public class ReservationMapper {
         responseReservation.setServiceId(reservation.getServiceId());
         responseReservation.setUserId(reservation.getUserId());
         responseReservation.setBarberId(reservation.getBarberId());
+        responseReservation.setAmount(reservation.getAmount());
         responseReservation.setDate(reservation.getDate());
         responseReservation.setTimeStart(reservation.getTimeStart());
         responseReservation.setTimeEnd(reservation.getTimeEnd());
@@ -28,6 +29,7 @@ public class ReservationMapper {
         reservation.setServiceId(request.getServiceId());
         reservation.setUserId(request.getUserId());
         reservation.setBarberId(request.getBarberId());
+        reservation.setAmount(request.getAmount());
         reservation.setDate(request.getDate());
         reservation.setTimeStart(request.getTimeStart());
         reservation.setTimeEnd(endTime);
