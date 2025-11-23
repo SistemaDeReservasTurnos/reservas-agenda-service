@@ -94,7 +94,7 @@ public class ReservationController {
         filters.setEndDate(endDate);
         filters.setStatus(status != null ? status.toUpperCase() : null);
 
-        // Llamar al service
+        // Call the service
         List<ResponseReservation> result = reservationService.searchAllReservationsAdmin(filters);
 
         return ResponseEntity.ok(result);
