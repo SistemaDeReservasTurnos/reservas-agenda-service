@@ -86,7 +86,7 @@ public class ReservationController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-        // Crear DTO de filtros
+        // Create filter DTO
         FilterReservationAdmin filters = new FilterReservationAdmin();
         filters.setUserId(userId);
         filters.setServiceId(serviceId);
