@@ -1,5 +1,5 @@
 ### Listar todas las reservas
-GET http://localhost:8083/api/reservations/search-admin?
+GET http://localhost:8083/api/reservations/search-admin
 
 ### Buscar reservas por usuario
 GET http://localhost:8083/api/reservations/search-admin?userId=17
