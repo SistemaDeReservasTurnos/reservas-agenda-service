@@ -14,4 +14,4 @@ GET http://localhost:8083/api/reservations/search-user?userId=18&startDate=2025-
 GET http://localhost:8083/api/reservations/search-user?userId=1&status=reserved
 
 ### Buscar por todos los filtros (usuario, rango de fecha y estado)
-GET http://localhost:8083/api/reservations/search-admin?userId=1&startDate=2025-11-16&endDate=2025-11-18&status=reserved
+GET http://localhost:8083/api/reservations/search-user?userId=1&startDate=2025-11-16&endDate=2025-11-18&status=reserved
