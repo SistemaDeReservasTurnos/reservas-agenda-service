@@ -65,10 +65,6 @@ public class ReservationController {
 
             @RequestParam(required = false) String status
     ) {
-        if(userId == null){
-            throw new IllegalArgumentException("User can't be null");
-        }
-
         FilterReservationUser filters = new FilterReservationUser();
         filters.setUserId(userId);
         filters.setStartDate(startDate);
