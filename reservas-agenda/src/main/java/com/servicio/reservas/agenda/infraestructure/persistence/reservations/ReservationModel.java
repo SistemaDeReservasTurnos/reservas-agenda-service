@@ -42,4 +42,7 @@ public class ReservationModel {
     @Column
     private Boolean active;
 
+    @Column
+    private Double amount;
+
 }

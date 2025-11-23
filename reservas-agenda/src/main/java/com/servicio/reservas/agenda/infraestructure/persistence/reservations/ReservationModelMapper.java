@@ -16,6 +16,7 @@ public class ReservationModelMapper {
         reservationModel.setEndTime(reservation.getTimeEnd());
         reservationModel.setStatus(reservation.getStatus());
         reservationModel.setActive(reservation.getActive());
+        reservationModel.setAmount(reservation.getAmount());
 
         return reservationModel;
     }
@@ -33,6 +34,7 @@ public class ReservationModelMapper {
         reservation.setTimeEnd(reservationModel.getEndTime());
         reservation.setStatus(reservationModel.getStatus());
         reservation.setActive(reservationModel.getActive());
+        reservation.setAmount(reservationModel.getAmount());
 
         return reservation;
     }

@@ -18,6 +18,7 @@ public class ReservationMapper {
         responseReservation.setTimeEnd(reservation.getTimeEnd());
         responseReservation.setStatus(reservation.getStatus());
         responseReservation.setActive(reservation.getActive());
+        responseReservation.setAmount(reservation.getAmount());
 
         return responseReservation;
     }
@@ -35,6 +36,7 @@ public class ReservationMapper {
 
         reservation.setStatus("RESERVED");
         reservation.setActive(true);
+        reservation.setAmount(request.getAmount());
 
         return reservation;
     }

@@ -22,5 +22,6 @@ public class ResponseReservation {
     private LocalTime timeEnd;
     private String status;
     private Boolean active;
+    private Double amount;
 
 }
