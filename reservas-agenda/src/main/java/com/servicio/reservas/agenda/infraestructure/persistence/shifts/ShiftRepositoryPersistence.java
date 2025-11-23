@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.persistence;
+package com.servicio.reservas.agenda.infraestructure.persistence.shifts;
 
 
 import com.servicio.reservas.agenda.domain.entities.Reservation;
@@ -8,7 +8,6 @@ import com.servicio.reservas.agenda.infraestructure.exception.CustomException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;

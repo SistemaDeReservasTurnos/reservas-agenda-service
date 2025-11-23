@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.persistence;
+package com.servicio.reservas.agenda.infraestructure.persistence.shifts;
 
 import jakarta.persistence.*;
 import lombok.Data;

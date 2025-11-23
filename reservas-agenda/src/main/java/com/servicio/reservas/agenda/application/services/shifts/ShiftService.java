@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.application.services;
+package com.servicio.reservas.agenda.application.services.shifts;
 
 import com.servicio.reservas.agenda.application.AvailabilityMode;
 import com.servicio.reservas.agenda.domain.TimeRange;
@@ -108,11 +108,11 @@ public class ShiftService implements IShiftService {
     }
 
     @Override
-    public void validateShift(Reservation reservation){
+    public void validateShift(Reservation reservation , AvailabilityMode mode){
         validateShiftDateTime(reservation.getDate(), reservation.getTimeStart());
         validateWorkSchedule(reservation.getTimeStart(), reservation.getTimeEnd());
         validationService(reservation.getServiceId());
-        validateAvailabilityBarber(reservation,  AvailabilityMode.CREATE);
+        validateAvailabilityBarber(reservation, mode);
     }
 
     @Override

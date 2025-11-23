@@ -22,6 +22,7 @@ public class Reservation {
     private LocalTime timeEnd;
     private String status;
     private Boolean active;
+    private Double amount;
 
     public void updateReservation(LocalDate date, LocalTime timeStart, LocalTime timeEnd) {
         this.date = date;
@@ -29,5 +30,4 @@ public class Reservation {
         this.timeEnd = timeEnd;
 
     }
-
 }

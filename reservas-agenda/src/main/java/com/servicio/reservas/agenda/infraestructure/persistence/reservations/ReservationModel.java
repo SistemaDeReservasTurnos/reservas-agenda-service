@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Entity(name = "reservation")
+@Entity
+@Table(name = "reservation")
 @Data
 @NoArgsConstructor
 
@@ -40,5 +41,8 @@ public class ReservationModel {
 
     @Column
     private Boolean active;
+
+    @Column
+    private Double amount;
 
 }

@@ -1,8 +1,8 @@
 package com.servicio.reservas.agenda.infraestructure.controller;
 
 import com.servicio.reservas.agenda.application.AvailabilityMode;
-import com.servicio.reservas.agenda.application.dto.RequestShift;
-import com.servicio.reservas.agenda.application.services.ShiftService;
+import com.servicio.reservas.agenda.application.dto.shifts.RequestShift;
+import com.servicio.reservas.agenda.application.services.shifts.ShiftService;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class TimeBlocksController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
 
         Reservation reservation = new Reservation();
-        reservation.setId(idBarber);
+        reservation.setBarberId(idBarber);
         reservation.setDate(date);
         reservation.setTimeStart(startTime);
         reservation.setTimeEnd(endTime);

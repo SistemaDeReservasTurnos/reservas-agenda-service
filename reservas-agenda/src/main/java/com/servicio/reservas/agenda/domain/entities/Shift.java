@@ -10,6 +10,7 @@ import java.time.LocalTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Shift {
 
     private Long id;
@@ -19,4 +20,5 @@ public class Shift {
     private LocalTime timeEnd;
     private Long reservationId;
     private String state;
+
 }

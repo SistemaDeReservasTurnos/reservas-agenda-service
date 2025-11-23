@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.application.dto;
+package com.servicio.reservas.agenda.application.dto.reservations;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,5 +22,6 @@ public class ResponseReservation {
     private LocalTime timeEnd;
     private String status;
     private Boolean active;
+    private Double amount;
 
 }

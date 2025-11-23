@@ -1,17 +1,20 @@
-package com.servicio.reservas.agenda.application.services;
+package com.servicio.reservas.agenda.application.services.reservations;
 
-import com.servicio.reservas.agenda.application.dto.RequestReservation;
-import com.servicio.reservas.agenda.application.dto.ReservationMapper;
-import com.servicio.reservas.agenda.application.dto.ResponseReservation;
+import com.servicio.reservas.agenda.application.AvailabilityMode;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
+import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationUser;
+import com.servicio.reservas.agenda.application.dto.reservations.RequestReservation;
+import com.servicio.reservas.agenda.application.dto.reservations.ReservationMapper;
+import com.servicio.reservas.agenda.application.dto.reservations.ResponseReservation;
+import com.servicio.reservas.agenda.application.services.shifts.IShiftService;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.ReservationsException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,11 +39,14 @@ public class ReservationService implements IReservationService {
         LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour())
                 .plusMinutes(duration.getMinute());
 
-        Reservation reservation1 = ReservationMapper.toDomain(reservation, endTime);
+        Double amount = serviceDTO.map(ServiceDTO::getPrice)
+                .orElseThrow(() -> new IllegalArgumentException("The price is empty"));
 
-        shiftService.validateShift(reservation1);
+        Reservation newReservation = ReservationMapper.toDomain(reservation, endTime, amount);
 
-        Reservation reservation2 = reservationRepository.save(reservation1);
+        shiftService.validateShift(newReservation, AvailabilityMode.CREATE);
+
+        Reservation reservation2 = reservationRepository.save(newReservation);
 
         shiftService.createShift(reservation2);
 
@@ -62,8 +68,11 @@ public class ReservationService implements IReservationService {
 
             LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour()).plusMinutes(duration.getMinute());
 
+            Double amount = serviceDTO.map(ServiceDTO::getPrice)
+                    .orElseThrow(() -> new IllegalArgumentException("The price is empty"));
+
             //valido el turno antes de modificar la reserva
-            shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime));
+            shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime, amount),  AvailabilityMode.UPDATE);
 
             //edito
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);
@@ -75,7 +84,6 @@ public class ReservationService implements IReservationService {
             throw new ReservationsException("The reservation ID " + id + " is deactivated.");
         }
 
-        //validar que no haya una reserva a esa hora que voy a poner
     }
 
     @Override
@@ -104,33 +112,50 @@ public class ReservationService implements IReservationService {
 
         Reservation foundReservation = findReservationByIdInternal(id);
         foundReservation.setActive(false);
+        foundReservation.setStatus("DEACTIVATED");
 
         reservationRepository.save(foundReservation);
+        shiftService.deleteShiftFromReservation(id);
 
+    }
+
+    @Override
+    public List<ResponseReservation> searchReservationsUser(FilterReservationUser filters) {
+
+        // Llama al repository con los filtros ya organizados
+        List<Reservation> results = reservationRepository.userReservations(
+                filters.getUserId(),
+                filters.getStartDate(),
+                filters.getEndDate(),
+                filters.getStatus()
+        );
+
+        // Convertir a DTO
+        return results.stream().map(ReservationMapper::toResponse).toList();
+    }
+
+    @Override
+    public List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters) {
+
+        List<Reservation> list = reservationRepository.adminSearchReservations(filters);
+        return list.stream().map(ReservationMapper::toResponse).toList();
     }
 
     @Override
     public ResponseReservation findReservationById(Long id) {
+
         return ReservationMapper.toResponse(findReservationByIdInternal(id));
     }
 
-    @Override
-    public void deleteReservation(Long id) {
-        //eliminar reserva solo si esta status = cancelada o active = false
-        Reservation foundReservation = findReservationByIdInternal(id);
-
-        if(!foundReservation.getActive()){}
-
-    }
-
     private Reservation findReservationByIdInternal(Long id) {
+
         Reservation reservation = reservationRepository.findByIdReservation(id)
                 .orElseThrow(() -> new ReservationsException("Reservation not found"));
 
         if (!reservation.getActive()) {
             throw new ReservationsException("The reservation ID " + id + " is deactivated.");
         }
-
         return reservation;
     }
+
 }

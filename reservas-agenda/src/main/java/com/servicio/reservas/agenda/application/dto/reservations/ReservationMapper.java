@@ -1,7 +1,6 @@
-package com.servicio.reservas.agenda.application.dto;
+package com.servicio.reservas.agenda.application.dto.reservations;
 
 import com.servicio.reservas.agenda.domain.entities.Reservation;
-
 import java.time.LocalTime;
 
 public class ReservationMapper {
@@ -19,12 +18,15 @@ public class ReservationMapper {
         responseReservation.setTimeEnd(reservation.getTimeEnd());
         responseReservation.setStatus(reservation.getStatus());
         responseReservation.setActive(reservation.getActive());
+        responseReservation.setAmount(reservation.getAmount());
 
         return responseReservation;
     }
 
-    public static Reservation toDomain(RequestReservation request, LocalTime endTime){
+    public static Reservation toDomain(RequestReservation request, LocalTime endTime, Double amount) {
+
         Reservation reservation = new Reservation();
+
         reservation.setServiceId(request.getServiceId());
         reservation.setUserId(request.getUserId());
         reservation.setBarberId(request.getBarberId());
@@ -34,7 +36,7 @@ public class ReservationMapper {
 
         reservation.setStatus("RESERVED");
         reservation.setActive(true);
-
+        reservation.setAmount(amount);
         return reservation;
     }
 }
