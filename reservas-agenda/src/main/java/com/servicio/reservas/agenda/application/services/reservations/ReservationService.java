@@ -11,6 +11,9 @@ import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.ReservationsException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
+import com.servicio.reservas.agenda.infraestructure.users.UserClient;
+import com.servicio.reservas.agenda.infraestructure.users.UserDTO;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -22,12 +25,13 @@ public class ReservationService implements IReservationService {
 
     private final IShiftService shiftService;
     private final IReservationRepository  reservationRepository;
+    private final UserClient userClient;
 
-    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository) {
+    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository, UserClient userClient) {
         this.shiftService = shiftService;
         this.reservationRepository = reservationRepository;
+        this.userClient = userClient;
     }
-
 
     @Override
     public ResponseReservation createReservation(RequestReservation reservation) {
@@ -50,7 +54,7 @@ public class ReservationService implements IReservationService {
 
         shiftService.createShift(reservation2);
 
-        return ReservationMapper.toResponse(reservation2);
+        return buildResponseWithUserNames(reservation2);
     }
 
     @Override
@@ -78,7 +82,7 @@ public class ReservationService implements IReservationService {
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);
             Reservation updatedR = reservationRepository.save(foundReservation);
 
-            return ReservationMapper.toResponse(updatedR);
+            return buildResponseWithUserNames(updatedR);
 
         }else {
             throw new ReservationsException("The reservation ID " + id + " is deactivated.");
@@ -131,20 +135,21 @@ public class ReservationService implements IReservationService {
         );
 
         // Convertir a DTO
-        return results.stream().map(ReservationMapper::toResponse).toList();
+        return results.stream().map(this::buildResponseWithUserNames).toList();
     }
 
     @Override
     public List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters) {
 
         List<Reservation> list = reservationRepository.adminSearchReservations(filters);
-        return list.stream().map(ReservationMapper::toResponse).toList();
+        return list.stream().map(this::buildResponseWithUserNames).toList();
     }
 
     @Override
     public ResponseReservation findReservationById(Long id) {
 
-        return ReservationMapper.toResponse(findReservationByIdInternal(id));
+        Reservation reservation = findReservationByIdInternal(id);
+        return buildResponseWithUserNames(reservation);
     }
 
     private Reservation findReservationByIdInternal(Long id) {
@@ -158,4 +163,18 @@ public class ReservationService implements IReservationService {
         return reservation;
     }
 
+    private ResponseReservation buildResponseWithUserNames(Reservation reservation) {
+
+        UserDTO client = userClient.findUserById(reservation.getUserId())
+                .orElseThrow(() -> new ReservationsException("The client is not found."));
+
+        UserDTO barber = userClient.findUserById(reservation.getBarberId())
+                .orElseThrow(() -> new ReservationsException("The barber is not found."));
+
+        return ReservationMapper.toResponse(
+                reservation,
+                client.getName(),
+                barber.getName()
+        );
+    }
 }

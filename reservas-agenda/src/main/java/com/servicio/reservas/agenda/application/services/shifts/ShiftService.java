@@ -8,6 +8,8 @@ import com.servicio.reservas.agenda.domain.repository.IShiftRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.CustomException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceClient;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
+import com.servicio.reservas.agenda.infraestructure.users.UserClient;
+import com.servicio.reservas.agenda.infraestructure.users.UserDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,7 +28,7 @@ public class ShiftService implements IShiftService {
     private final ServiceClient serviceClient;
     private final IShiftRepository shiftRepository;
 
-    public ShiftService(ServiceClient serviceClient, IShiftRepository shiftRepository) {
+    public ShiftService(ServiceClient serviceClient, IShiftRepository shiftRepository, UserClient userClient) {
         this.serviceClient = serviceClient;
         this.shiftRepository = shiftRepository;
     }
