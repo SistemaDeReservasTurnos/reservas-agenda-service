@@ -43,14 +43,25 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Invalid parameter type", request.getRequestURI(), details);
     }
 
-    @ExceptionHandler(CustomException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleCustomException(CustomException ex, HttpServletRequest request) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
         return new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
                 ex.getMessage(),
-                request.getRequestURI(),
-                null
+                request.getRequestURI()
+        );
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErrorResponse handleBusiness(BusinessException ex, HttpServletRequest request) {
+        return new ErrorResponse(
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Business Rule Violation",
+                ex.getMessage(),
+                request.getRequestURI()
         );
     }
 
