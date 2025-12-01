@@ -9,7 +9,6 @@ import com.servicio.reservas.agenda.infraestructure.exception.BusinessException;
 import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceClient;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
-import com.servicio.reservas.agenda.infraestructure.users.UserClient;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,7 +27,7 @@ public class ShiftService implements IShiftService {
     private final ServiceClient serviceClient;
     private final IShiftRepository shiftRepository;
 
-    public ShiftService(ServiceClient serviceClient, IShiftRepository shiftRepository, UserClient userClient) {
+    public ShiftService(ServiceClient serviceClient, IShiftRepository shiftRepository) {
         this.serviceClient = serviceClient;
         this.shiftRepository = shiftRepository;
     }
