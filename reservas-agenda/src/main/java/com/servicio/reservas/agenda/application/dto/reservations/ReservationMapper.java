@@ -5,10 +5,7 @@ import java.time.LocalTime;
 
 public class ReservationMapper {
 
-    public static ResponseReservation toResponse(
-            Reservation reservation,
-            String userName,
-            String barberName) {
+    public static ResponseReservation toResponse(Reservation reservation) {
 
         ResponseReservation responseReservation = new ResponseReservation();
 
@@ -22,9 +19,6 @@ public class ReservationMapper {
         responseReservation.setStatus(reservation.getStatus());
         responseReservation.setActive(reservation.getActive());
         responseReservation.setAmount(reservation.getAmount());
-
-        responseReservation.setNameBarber(barberName);
-        responseReservation.setNameUser(userName);
 
         return responseReservation;
     }

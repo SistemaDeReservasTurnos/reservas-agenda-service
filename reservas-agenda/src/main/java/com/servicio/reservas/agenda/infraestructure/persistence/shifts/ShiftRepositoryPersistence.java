@@ -4,7 +4,7 @@ package com.servicio.reservas.agenda.infraestructure.persistence.shifts;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
 import com.servicio.reservas.agenda.domain.repository.IShiftRepository;
-import com.servicio.reservas.agenda.infraestructure.exception.CustomException;
+import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -57,8 +57,9 @@ public class ShiftRepositoryPersistence implements IShiftRepository {
 
     @Override
     public void deleteById(Long id){
-        ShiftModel model = springShiftRepository.findById(id)
-                .orElseThrow(() ->  new CustomException("Shift not found"));
+        if (!springShiftRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Shift with Id " + id + " not found");
+        }
         springShiftRepository.deleteById(id);
     }
 
@@ -70,6 +71,7 @@ public class ShiftRepositoryPersistence implements IShiftRepository {
 
     @Override
     public void updateStateShiftByReservationId(Long id){
+
         springShiftRepository.updateStateShiftByReservationId(id);
     }
 

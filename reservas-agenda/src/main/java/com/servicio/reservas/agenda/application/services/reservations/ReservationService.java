@@ -9,11 +9,9 @@ import com.servicio.reservas.agenda.application.dto.reservations.ResponseReserva
 import com.servicio.reservas.agenda.application.services.shifts.IShiftService;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
-import com.servicio.reservas.agenda.infraestructure.exception.ReservationsException;
+import com.servicio.reservas.agenda.infraestructure.exception.BusinessException;
+import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
-import com.servicio.reservas.agenda.infraestructure.users.UserClient;
-import com.servicio.reservas.agenda.infraestructure.users.UserDTO;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,12 +23,10 @@ public class ReservationService implements IReservationService {
 
     private final IShiftService shiftService;
     private final IReservationRepository  reservationRepository;
-    private final UserClient userClient;
 
-    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository, UserClient userClient) {
+    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository) {
         this.shiftService = shiftService;
         this.reservationRepository = reservationRepository;
-        this.userClient = userClient;
     }
 
     @Override
@@ -39,12 +35,12 @@ public class ReservationService implements IReservationService {
         Optional<ServiceDTO> serviceDTO = shiftService.validationService(reservation.getServiceId());
 
         LocalTime duration = serviceDTO.map(ServiceDTO::getDuration)
-                .orElseThrow(() -> new IllegalArgumentException("The service duration is empty"));
+                .orElseThrow(() -> new BusinessException("The service duration is empty"));
         LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour())
                 .plusMinutes(duration.getMinute());
 
         Double amount = serviceDTO.map(ServiceDTO::getPrice)
-                .orElseThrow(() -> new IllegalArgumentException("The price is empty"));
+                .orElseThrow(() -> new BusinessException("The price is empty"));
 
         Reservation newReservation = ReservationMapper.toDomain(reservation, endTime, amount);
 
@@ -54,7 +50,7 @@ public class ReservationService implements IReservationService {
 
         shiftService.createShift(reservation2);
 
-        return buildResponseWithUserNames(reservation2);
+        return ReservationMapper.toResponse(reservation2);
     }
 
     @Override
@@ -82,10 +78,10 @@ public class ReservationService implements IReservationService {
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);
             Reservation updatedR = reservationRepository.save(foundReservation);
 
-            return buildResponseWithUserNames(updatedR);
+            return ReservationMapper.toResponse(updatedR);
 
         }else {
-            throw new ReservationsException("The reservation ID " + id + " is deactivated.");
+            throw new BusinessException("The reservation ID " + id + " is deactivated.");
         }
 
     }
@@ -107,7 +103,7 @@ public class ReservationService implements IReservationService {
             shiftService.deleteShiftFromReservation(id);
 
         }else{
-            throw new ReservationsException("To cancel a reservation, you must give at least 24 hours' notice. ");
+            throw new BusinessException("To cancel a reservation, you must give at least 24 hours' notice. ");
         }
     }
 
@@ -135,46 +131,31 @@ public class ReservationService implements IReservationService {
         );
 
         // Convertir a DTO
-        return results.stream().map(this::buildResponseWithUserNames).toList();
+        return results.stream().map(ReservationMapper::toResponse).toList();
     }
 
     @Override
     public List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters) {
 
         List<Reservation> list = reservationRepository.adminSearchReservations(filters);
-        return list.stream().map(this::buildResponseWithUserNames).toList();
+        return list.stream().map(ReservationMapper::toResponse).toList();
     }
 
     @Override
     public ResponseReservation findReservationById(Long id) {
 
         Reservation reservation = findReservationByIdInternal(id);
-        return buildResponseWithUserNames(reservation);
+        return ReservationMapper.toResponse(reservation);
     }
 
     private Reservation findReservationByIdInternal(Long id) {
 
         Reservation reservation = reservationRepository.findByIdReservation(id)
-                .orElseThrow(() -> new ReservationsException("Reservation not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
 
         if (!reservation.getActive()) {
-            throw new ReservationsException("The reservation ID " + id + " is deactivated.");
+            throw new BusinessException("The reservation ID " + id + " is deactivated.");
         }
         return reservation;
-    }
-
-    private ResponseReservation buildResponseWithUserNames(Reservation reservation) {
-
-        UserDTO client = userClient.findUserById(reservation.getUserId())
-                .orElseThrow(() -> new ReservationsException("The client is not found."));
-
-        UserDTO barber = userClient.findUserById(reservation.getBarberId())
-                .orElseThrow(() -> new ReservationsException("The barber is not found."));
-
-        return ReservationMapper.toResponse(
-                reservation,
-                client.getName(),
-                barber.getName()
-        );
     }
 }
