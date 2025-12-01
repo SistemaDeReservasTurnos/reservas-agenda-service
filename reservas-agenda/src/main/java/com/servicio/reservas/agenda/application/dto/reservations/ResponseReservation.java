@@ -15,11 +15,8 @@ public class ResponseReservation {
 
     private Long id;
     private Long serviceId;
-    private String nameService;
     private Long userId;
-    private String nameUser;
     private Long barberId;
-    private String nameBarber;
     private LocalDate date;
     private LocalTime timeStart;
     private LocalTime timeEnd;
