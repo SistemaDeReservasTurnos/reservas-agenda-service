@@ -5,7 +5,8 @@ import com.servicio.reservas.agenda.domain.TimeRange;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
 import com.servicio.reservas.agenda.domain.repository.IShiftRepository;
-import com.servicio.reservas.agenda.infraestructure.exception.CustomException;
+import com.servicio.reservas.agenda.infraestructure.exception.BusinessException;
+import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceClient;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class ShiftService implements IShiftService {
                 range -> range.isContained(start, end));
 
                 if(!isValid){
-                    throw new CustomException("The schedule must be between 8:00–12:00 or 14:00–18:00.");
+                    throw new BusinessException("The schedule must be between 8:00–12:00 or 14:00–18:00.");
                 }
     }
 
@@ -47,28 +48,16 @@ public class ShiftService implements IShiftService {
         LocalTime now = LocalTime.now();
 
         if(date.isBefore(today)) {
-            throw new CustomException("You cannot schedule a shift in the past.");
+            throw new BusinessException("You cannot schedule a shift in the past.");
         }
 
         if(date.isEqual(today) && startTime.isBefore(now)) {
-            throw new CustomException("The selected time is no longer available today.");
+            throw new BusinessException("The selected time is no longer available today.");
         }
     }
 
     @Override
     public boolean validateAvailabilityBarber(Reservation reservation, AvailabilityMode mode) {
-        if (reservation.getBarberId() == null) {
-            throw new CustomException("The field barberId cannot be null");
-        }
-        if (reservation.getDate() == null) {
-            throw new CustomException("The field date cannot be null");
-        }
-        if (reservation.getTimeStart() == null || reservation.getTimeEnd() == null) {
-            throw new CustomException("Start time and end time must be provided");
-        }
-        if (mode == null) {
-            throw new CustomException("Availability mode cannot be null");
-        }
 
         boolean existsOverlap = switch (mode) {
             case UPDATE -> shiftRepository.existsOverlappingReservationUpdate(reservation);
@@ -76,7 +65,7 @@ public class ShiftService implements IShiftService {
         };
 
         if (existsOverlap) {
-            throw new CustomException("The selected time overlaps with another shift");
+            throw new BusinessException("The selected time overlaps with another shift");
         }
 
         return true;
@@ -87,7 +76,7 @@ public class ShiftService implements IShiftService {
         try {
             return serviceClient.findServiceById(serviceId);
         } catch (feign.FeignException.NotFound e) {
-            throw new CustomException("The service with ID " + serviceId + " was not found.");
+            throw new ResourceNotFoundException("The service with ID " + serviceId + " was not found.");
         }
     }
 
@@ -129,7 +118,7 @@ public class ShiftService implements IShiftService {
 
     public Shift findById(Long id) {
         return shiftRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Shift not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Shift not found with id: " + id));
     }
 
     @Override

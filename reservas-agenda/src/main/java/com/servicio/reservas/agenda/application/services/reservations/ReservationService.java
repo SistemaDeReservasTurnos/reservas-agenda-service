@@ -9,7 +9,8 @@ import com.servicio.reservas.agenda.application.dto.reservations.ResponseReserva
 import com.servicio.reservas.agenda.application.services.shifts.IShiftService;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
-import com.servicio.reservas.agenda.infraestructure.exception.ReservationsException;
+import com.servicio.reservas.agenda.infraestructure.exception.BusinessException;
+import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -28,19 +29,18 @@ public class ReservationService implements IReservationService {
         this.reservationRepository = reservationRepository;
     }
 
-
     @Override
     public ResponseReservation createReservation(RequestReservation reservation) {
 
         Optional<ServiceDTO> serviceDTO = shiftService.validationService(reservation.getServiceId());
 
         LocalTime duration = serviceDTO.map(ServiceDTO::getDuration)
-                .orElseThrow(() -> new IllegalArgumentException("The service duration is empty"));
+                .orElseThrow(() -> new BusinessException("The service duration is empty"));
         LocalTime endTime = reservation.getTimeStart().plusHours(duration.getHour())
                 .plusMinutes(duration.getMinute());
 
         Double amount = serviceDTO.map(ServiceDTO::getPrice)
-                .orElseThrow(() -> new IllegalArgumentException("The price is empty"));
+                .orElseThrow(() -> new BusinessException("The price is empty"));
 
         Reservation newReservation = ReservationMapper.toDomain(reservation, endTime, amount);
 
@@ -81,7 +81,7 @@ public class ReservationService implements IReservationService {
             return ReservationMapper.toResponse(updatedR);
 
         }else {
-            throw new ReservationsException("The reservation ID " + id + " is deactivated.");
+            throw new BusinessException("The reservation ID " + id + " is deactivated.");
         }
 
     }
@@ -103,7 +103,7 @@ public class ReservationService implements IReservationService {
             shiftService.deleteShiftFromReservation(id);
 
         }else{
-            throw new ReservationsException("To cancel a reservation, you must give at least 24 hours' notice. ");
+            throw new BusinessException("To cancel a reservation, you must give at least 24 hours' notice. ");
         }
     }
 
@@ -144,18 +144,18 @@ public class ReservationService implements IReservationService {
     @Override
     public ResponseReservation findReservationById(Long id) {
 
-        return ReservationMapper.toResponse(findReservationByIdInternal(id));
+        Reservation reservation = findReservationByIdInternal(id);
+        return ReservationMapper.toResponse(reservation);
     }
 
     private Reservation findReservationByIdInternal(Long id) {
 
         Reservation reservation = reservationRepository.findByIdReservation(id)
-                .orElseThrow(() -> new ReservationsException("Reservation not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
 
         if (!reservation.getActive()) {
-            throw new ReservationsException("The reservation ID " + id + " is deactivated.");
+            throw new BusinessException("The reservation ID " + id + " is deactivated.");
         }
         return reservation;
     }
-
 }
