@@ -11,8 +11,13 @@ import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.BusinessException;
 import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
+import com.servicio.reservas.agenda.infraestructure.services.ServiceClient;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
+import com.servicio.reservas.agenda.infraestructure.users.UserClient;
+import com.servicio.reservas.agenda.infraestructure.users.UserDTO;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -23,10 +28,14 @@ public class ReservationService implements IReservationService {
 
     private final IShiftService shiftService;
     private final IReservationRepository  reservationRepository;
+    private final UserClient userClient;
+    private final ServiceClient serviceClient;
 
-    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository) {
+    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository, UserClient userClient, ServiceClient serviceClient) {
         this.shiftService = shiftService;
         this.reservationRepository = reservationRepository;
+        this.userClient = userClient;
+        this.serviceClient = serviceClient;
     }
 
     @Override
@@ -50,7 +59,7 @@ public class ReservationService implements IReservationService {
 
         shiftService.createShift(reservation2);
 
-        return ReservationMapper.toResponse(reservation2);
+        return buildResponseWithUserNames(reservation2);
     }
 
     @Override
@@ -78,7 +87,7 @@ public class ReservationService implements IReservationService {
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);
             Reservation updatedR = reservationRepository.save(foundReservation);
 
-            return ReservationMapper.toResponse(updatedR);
+            return buildResponseWithUserNames(updatedR);
 
         }else {
             throw new BusinessException("The reservation ID " + id + " is deactivated.");
@@ -131,21 +140,34 @@ public class ReservationService implements IReservationService {
         );
 
         // Convertir a DTO
-        return results.stream().map(ReservationMapper::toResponse).toList();
+        return results.stream().map(this::buildResponseWithUserNames).toList();
     }
 
     @Override
     public List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters) {
 
         List<Reservation> list = reservationRepository.adminSearchReservations(filters);
-        return list.stream().map(ReservationMapper::toResponse).toList();
+        return list.stream().map(this::buildResponseWithUserNames).toList();
     }
 
     @Override
     public ResponseReservation findReservationById(Long id) {
 
         Reservation reservation = findReservationByIdInternal(id);
-        return ReservationMapper.toResponse(reservation);
+        return buildResponseWithUserNames(reservation);
+    }
+
+    @Override
+    public List<ResponseReservation> getReservationsCompletedForTime(String period) {
+
+        LocalDate startDate = switch (period.toLowerCase()) {
+            case "week" -> LocalDate.now().minusDays(7);
+            case "month" -> LocalDate.now().minusMonths(1);
+            default -> throw new BusinessException("Invalid period: " + period + ". Supported values are: 'week', 'month'");
+        };
+
+        List<Reservation> reservations = reservationRepository.findCompletedByDate(startDate);
+        return reservations.stream().map(this::buildResponseWithUserNames).toList();
     }
 
     private Reservation findReservationByIdInternal(Long id) {
@@ -157,5 +179,24 @@ public class ReservationService implements IReservationService {
             throw new BusinessException("The reservation ID " + id + " is deactivated.");
         }
         return reservation;
+    }
+
+    private ResponseReservation buildResponseWithUserNames(Reservation reservation) {
+
+        UserDTO client = userClient.findUserById(reservation.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("The client is not found."));
+
+        UserDTO barber = userClient.findUserById(reservation.getBarberId())
+                .orElseThrow(() -> new ResourceNotFoundException("The barber is not found."));
+
+        ServiceDTO service = serviceClient.findServiceById(reservation.getServiceId())
+                .orElseThrow(() -> new ResourceNotFoundException("The service is not found."));
+
+        return ReservationMapper.toResponse(
+                reservation,
+                client.getName(),
+                barber.getName(),
+                service.getName()
+        );
     }
 }

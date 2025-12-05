@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.services;
+package com.servicio.reservas.agenda.infraestructure.users;
 
 import com.servicio.reservas.agenda.infraestructure.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Optional;
 
 @FeignClient(
-        name = "reservas-servicios-service",
+        name = "reservas-usuarios-service",
         configuration = FeignConfig.class)
+public interface UserClient {
+    @GetMapping("/api/users/user/{id}")
+    Optional<UserDTO> findUserById(@PathVariable("id") Long id);
 
-public interface ServiceClient {
-    @GetMapping("/api/services/{id}")
-    Optional<ServiceDTO> findServiceById(@PathVariable("id") Long id);
 }

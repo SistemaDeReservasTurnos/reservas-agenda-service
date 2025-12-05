@@ -60,4 +60,12 @@ public class ReservationRepositoryPersistence implements IReservationRepository 
 
         return result.stream().map(ReservationModelMapper::toDomain).toList();
     }
+
+    @Override
+    public List<Reservation> findCompletedByDate(LocalDate startDate) {
+        List<ReservationModel> reservations = springReservationRepository.findCompletedStatusByDate(startDate);
+        return reservations.stream()
+                .map(ReservationModelMapper::toDomain)
+                .toList();
+    }
 }

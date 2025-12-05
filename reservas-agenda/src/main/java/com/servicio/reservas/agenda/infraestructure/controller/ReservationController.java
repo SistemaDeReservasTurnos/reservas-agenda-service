@@ -110,5 +110,14 @@ public class ReservationController {
         return ResponseEntity.ok(result);
     }
 
+    // -------- RUTAS PARA REPORTES --------
+
+    @GetMapping("/completed-list")
+    public ResponseEntity<List<ResponseReservation>> getReservationsCompletedForTime(
+            @RequestParam String period){
+        List<ResponseReservation> reservations = reservationService.getReservationsCompletedForTime(period);
+        return ResponseEntity.ok().body(reservations);
+    }
+
 }
 
