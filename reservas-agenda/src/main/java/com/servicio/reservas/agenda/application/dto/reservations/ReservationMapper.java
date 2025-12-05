@@ -8,7 +8,8 @@ public class ReservationMapper {
     public static ResponseReservation toResponse(
             Reservation reservation,
             String userName,
-            String barberName) {
+            String barberName,
+            String serviceName) {
 
         ResponseReservation responseReservation = new ResponseReservation();
 
@@ -25,6 +26,7 @@ public class ReservationMapper {
 
         responseReservation.setNameBarber(barberName);
         responseReservation.setNameUser(userName);
+        responseReservation.setNameService(serviceName);
 
         return responseReservation;
     }

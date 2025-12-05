@@ -11,6 +11,7 @@ import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.BusinessException;
 import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
+import com.servicio.reservas.agenda.infraestructure.services.ServiceClient;
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 import com.servicio.reservas.agenda.infraestructure.users.UserClient;
 import com.servicio.reservas.agenda.infraestructure.users.UserDTO;
@@ -28,11 +29,13 @@ public class ReservationService implements IReservationService {
     private final IShiftService shiftService;
     private final IReservationRepository  reservationRepository;
     private final UserClient userClient;
+    private final ServiceClient serviceClient;
 
-    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository, UserClient userClient) {
+    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository, UserClient userClient, ServiceClient serviceClient) {
         this.shiftService = shiftService;
         this.reservationRepository = reservationRepository;
         this.userClient = userClient;
+        this.serviceClient = serviceClient;
     }
 
     @Override
@@ -160,7 +163,7 @@ public class ReservationService implements IReservationService {
         LocalDate startDate = switch (period.toLowerCase()) {
             case "week" -> LocalDate.now().minusDays(7);
             case "month" -> LocalDate.now().minusMonths(1);
-            default -> throw new BusinessException("Invalid period");
+            default -> throw new BusinessException("Invalid period: " + period + ". Supported values are: 'week', 'month'");
         };
 
         List<Reservation> reservations = reservationRepository.findCompletedByDate(startDate);
@@ -186,10 +189,14 @@ public class ReservationService implements IReservationService {
         UserDTO barber = userClient.findUserById(reservation.getBarberId())
                 .orElseThrow(() -> new ResourceNotFoundException("The barber is not found."));
 
+        ServiceDTO service = serviceClient.findServiceById(reservation.getServiceId())
+                .orElseThrow(() -> new ResourceNotFoundException("The service is not found."));
+
         return ReservationMapper.toResponse(
                 reservation,
                 client.getName(),
-                barber.getName()
+                barber.getName(),
+                service.getName()
         );
     }
 }
