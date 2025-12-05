@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +15,7 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
     @NotNull Optional<ReservationModel> findById(@NotNull Long id);
 
     @Query("""
-
-            SELECT r FROM ReservationModel r
+    SELECT r FROM ReservationModel r
     WHERE r.active = true
     AND r.status NOT IN ('CANCELED', 'COMPLETED')
     AND (
@@ -30,7 +30,6 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
     //usuario/cliente
 
     @Query("""
-    
     SELECT r FROM ReservationModel r
     WHERE (:userId IS NULL OR r.userId = :userId)
     AND (COALESCE(:startDate, r.date) <= r.date)
@@ -61,4 +60,12 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("status") String status);
+
+
+    @Query("""
+    SELECT r FROM ReservationModel r
+    WHERE r.status = 'COMPLETED'
+    AND r.date >= :startDate
+""")
+    List<ReservationModel> findCompletedStatusByDate(@Param("startDate") LocalDate startDate);
 }

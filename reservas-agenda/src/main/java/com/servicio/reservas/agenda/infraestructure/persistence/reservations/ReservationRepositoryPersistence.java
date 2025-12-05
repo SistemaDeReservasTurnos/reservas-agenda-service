@@ -5,6 +5,7 @@ import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -59,5 +60,13 @@ public class ReservationRepositoryPersistence implements IReservationRepository 
                         filters.getStatus());
 
         return result.stream().map(ReservationModelMapper::toDomain).toList();
+    }
+
+    @Override
+    public List<Reservation> findCompletedByDate(LocalDate startDate) {
+        List<ReservationModel> reservations = springReservationRepository.findCompletedStatusByDate(startDate);
+        return reservations.stream()
+                .map(ReservationModelMapper::toDomain)
+                .toList();
     }
 }

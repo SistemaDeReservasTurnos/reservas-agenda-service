@@ -14,8 +14,9 @@ import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundEx
 import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
 import com.servicio.reservas.agenda.infraestructure.users.UserClient;
 import com.servicio.reservas.agenda.infraestructure.users.UserDTO;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -151,6 +152,19 @@ public class ReservationService implements IReservationService {
 
         Reservation reservation = findReservationByIdInternal(id);
         return buildResponseWithUserNames(reservation);
+    }
+
+    @Override
+    public List<ResponseReservation> getReservationsCompletedForTime(String period) {
+
+        LocalDate startDate = switch (period.toLowerCase()) {
+            case "week" -> LocalDate.now().minusDays(7);
+            case "month" -> LocalDate.now().minusMonths(1);
+            default -> throw new BusinessException("Invalid period");
+        };
+
+        List<Reservation> reservations = reservationRepository.findCompletedByDate(startDate);
+        return reservations.stream().map(this::buildResponseWithUserNames).toList();
     }
 
     private Reservation findReservationByIdInternal(Long id) {
