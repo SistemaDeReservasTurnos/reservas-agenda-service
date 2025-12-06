@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.controller;
+package com.servicio.reservas.agenda.infraestructure.input.controller;
 
 import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
 import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationUser;

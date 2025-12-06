@@ -1,14 +1,14 @@
 package com.servicio.reservas.agenda.application.services.shifts;
 
-import com.servicio.reservas.agenda.application.AvailabilityMode;
-import com.servicio.reservas.agenda.domain.TimeRange;
+import com.servicio.reservas.agenda.domain.entities.AvailabilityMode;
+import com.servicio.reservas.agenda.domain.entities.TimeRange;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
 import com.servicio.reservas.agenda.domain.repository.IShiftRepository;
 import com.servicio.reservas.agenda.infraestructure.exception.BusinessException;
 import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
-import com.servicio.reservas.agenda.infraestructure.services.ServiceClient;
-import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
+import com.servicio.reservas.agenda.infraestructure.output.client.services.ServiceClient;
+import com.servicio.reservas.agenda.infraestructure.output.client.services.ServiceDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

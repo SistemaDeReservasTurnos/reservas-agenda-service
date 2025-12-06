@@ -1,6 +1,6 @@
-package com.servicio.reservas.agenda.infraestructure.controller;
+package com.servicio.reservas.agenda.infraestructure.input.controller;
 
-import com.servicio.reservas.agenda.application.AvailabilityMode;
+import com.servicio.reservas.agenda.domain.entities.AvailabilityMode;
 import com.servicio.reservas.agenda.application.dto.shifts.RequestShift;
 import com.servicio.reservas.agenda.application.services.shifts.ShiftService;
 import com.servicio.reservas.agenda.domain.entities.Reservation;

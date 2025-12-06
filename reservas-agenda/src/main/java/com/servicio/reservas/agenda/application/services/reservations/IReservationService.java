@@ -15,5 +15,4 @@ public interface IReservationService {
     void deactivateReservation(Long id);
     List<ResponseReservation> searchReservationsUser( FilterReservationUser filters);
     List<ResponseReservation> searchAllReservationsAdmin(FilterReservationAdmin filters);
-
 }

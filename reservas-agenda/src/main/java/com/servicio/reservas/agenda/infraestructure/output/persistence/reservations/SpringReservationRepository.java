@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.persistence.reservations;
+package com.servicio.reservas.agenda.infraestructure.output.persistence.reservations;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,8 +14,7 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
     @NotNull Optional<ReservationModel> findById(@NotNull Long id);
 
     @Query("""
-
-            SELECT r FROM ReservationModel r
+    SELECT r FROM ReservationModel r
     WHERE r.active = true
     AND r.status NOT IN ('CANCELED', 'COMPLETED')
     AND (
@@ -30,7 +29,6 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
     //usuario/cliente
 
     @Query("""
-    
     SELECT r FROM ReservationModel r
     WHERE (:userId IS NULL OR r.userId = :userId)
     AND (COALESCE(:startDate, r.date) <= r.date)
@@ -61,4 +59,5 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("status") String status);
+
 }
