@@ -28,14 +28,14 @@ public class ReservationService implements IReservationService {
     private final IReservationRepository  reservationRepository;
     private final UserClient userClient;
     private final ServiceClient serviceClient;
-    private final EventPublisher eventoPublisher;
+    private final EventPublisher eventPublisher;
 
     public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository, UserClient userClient, ServiceClient serviceClient, EventPublisher eventoPublisher) {
         this.shiftService = shiftService;
         this.reservationRepository = reservationRepository;
         this.userClient = userClient;
         this.serviceClient = serviceClient;
-        this.eventoPublisher = eventoPublisher;
+        this.eventPublisher = eventoPublisher;
     }
 
     @Override
@@ -61,9 +61,9 @@ public class ReservationService implements IReservationService {
 
         ResponseReservation responseReservation = buildResponseWithUserNames(reservation2);
 
-        // Se envia la resrerva creada a reportes
+        // Sending created reservation to reporting
         ReportReservationEvent event = ReservationMapper.toReport(responseReservation);
-        eventoPublisher.publicarEvento("reserva.creada", event);
+        eventPublisher.publishEvent("reserva.creada", event);
 
         return responseReservation;
     }
@@ -73,9 +73,9 @@ public class ReservationService implements IReservationService {
 
         Optional<ServiceDTO> serviceDTO = shiftService.validationService(reservation.getServiceId());
 
-        Reservation foundReservation = findReservationByIdInternal(id); //busco la reserva a editar
+        Reservation foundReservation = findReservationByIdInternal(id);
 
-        //modifico la reserva si active == true
+        //I modify the reservation if active == true
         if(foundReservation.getActive()){
 
             LocalTime duration = serviceDTO.map(ServiceDTO::getDuration)
@@ -86,10 +86,10 @@ public class ReservationService implements IReservationService {
             Double amount = serviceDTO.map(ServiceDTO::getPrice)
                     .orElseThrow(() -> new IllegalArgumentException("The price is empty"));
 
-            //valido el turno antes de modificar la reserva
+            //Shift validated before modifying the reservation
             shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime, amount),  AvailabilityMode.UPDATE);
 
-            //edito
+            //edit
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);
             Reservation updatedR = reservationRepository.save(foundReservation);
 
@@ -119,7 +119,7 @@ public class ReservationService implements IReservationService {
 
             CancelReservationEvent event = new CancelReservationEvent();
             event.setReservationId(foundReservation.getId());
-            eventoPublisher.publicarEvento("reserva.cancelada", event);
+            eventPublisher.publishEvent("reserva.cancelada", event);
 
         }else{
             throw new BusinessException("To cancel a reservation, you must give at least 24 hours' notice. ");
@@ -149,7 +149,7 @@ public class ReservationService implements IReservationService {
                 filters.getStatus()
         );
 
-        // Convertir a DTO
+        // Convert to DTO
         return results.stream().map(this::buildResponseWithUserNames).toList();
     }
 

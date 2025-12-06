@@ -16,7 +16,7 @@ public class FinalizeReservationsUseCase {
 
     private final IReservationRepository reservationRepository;
     private final IShiftRepository shiftRepository;
-    private final EventPublisher eventoPublisher;
+    private final EventPublisher eventPublisher;
 
     public FinalizeReservationsUseCase(
             IReservationRepository reservationRepository,
@@ -24,7 +24,7 @@ public class FinalizeReservationsUseCase {
             EventPublisher eventoPublisher) {
         this.reservationRepository = reservationRepository;
         this.shiftRepository = shiftRepository;
-        this.eventoPublisher = eventoPublisher;
+        this.eventPublisher = eventoPublisher;
     }
 
     public void execute() {
@@ -44,7 +44,7 @@ public class FinalizeReservationsUseCase {
             // Se completa la reserva y se envia a reportes
             CompletedReservationEvent event = new CompletedReservationEvent();
             event.setReservationId(r.getId());
-            eventoPublisher.publicarEvento("reserva.completada", event);
+            eventPublisher.publishEvent("reserva.completada", event);
         }
     }
 }

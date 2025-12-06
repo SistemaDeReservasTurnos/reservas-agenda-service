@@ -1,6 +1,7 @@
 package com.servicio.reservas.agenda.infraestructure.output.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.servicio.reservas.agenda.infraestructure.exception.TechnicalException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,12 @@ public class EventPublisher {
         this.objectMapper = objectMapper;
     }
 
-    public void publicarEvento(String routingKey, Object evento) {
+    public void publishEvent(String routingKey, Object event) {
         try {
-            String json = objectMapper.writeValueAsString(evento);
+            String json = objectMapper.writeValueAsString(event);
             rabbitTemplate.convertAndSend(exchange, routingKey, json);
         } catch (Exception e) {
-            throw new RuntimeException("Error serializando evento", e);
+            throw new TechnicalException("Error serializing event", e);
         }
     }
-
 }

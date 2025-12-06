@@ -75,4 +75,16 @@ public class GlobalExceptionHandler {
                 null
         );
     }
+
+    @ExceptionHandler(TechnicalException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleTechnical(TechnicalException ex, HttpServletRequest request) {
+        return new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Technical Error",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
 }
