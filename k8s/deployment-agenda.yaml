@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deploy-agenda
-  namespace: StudioBarber
+  namespace: studio-barber
   labels:
     app: reservas-agenda-service
 spec:
@@ -24,6 +24,9 @@ spec:
             - containerPort: 8084
               protocol: TCP
           env:
+            - name: SPRING_PROFILES_ACTIVE # -> para activar el perfil de cloud (configuraciones especificas para la nube)
+              value: "cloud"
+
             - name: DB_HOST
               value: "127.0.0.1" # La aplicación se conecta al sidecar
             - name: DB_PORT

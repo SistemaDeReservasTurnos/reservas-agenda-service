@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: StudioBarber
+  namespace: studio-barber
   name: agenda-service
 spec:
   selector:
