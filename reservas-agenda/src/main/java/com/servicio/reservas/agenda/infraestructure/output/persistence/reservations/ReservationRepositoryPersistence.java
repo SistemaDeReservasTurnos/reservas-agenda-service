@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.persistence.reservations;
+package com.servicio.reservas.agenda.infraestructure.output.persistence.reservations;
 
 import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
@@ -59,13 +59,5 @@ public class ReservationRepositoryPersistence implements IReservationRepository 
                         filters.getStatus());
 
         return result.stream().map(ReservationModelMapper::toDomain).toList();
-    }
-
-    @Override
-    public List<Reservation> findCompletedByDate(LocalDate startDate) {
-        List<ReservationModel> reservations = springReservationRepository.findCompletedStatusByDate(startDate);
-        return reservations.stream()
-                .map(ReservationModelMapper::toDomain)
-                .toList();
     }
 }

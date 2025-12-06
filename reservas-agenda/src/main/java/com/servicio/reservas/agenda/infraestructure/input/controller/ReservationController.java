@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.controller;
+package com.servicio.reservas.agenda.infraestructure.input.controller;
 
 import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
 import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationUser;
@@ -108,15 +108,6 @@ public class ReservationController {
         // Llamar al service
         List<ResponseReservation> result = reservationService.searchAllReservationsAdmin(filters);
         return ResponseEntity.ok(result);
-    }
-
-    // -------- RUTAS PARA REPORTES --------
-
-    @GetMapping("/completed-list")
-    public ResponseEntity<List<ResponseReservation>> getReservationsCompletedForTime(
-            @RequestParam String period){
-        List<ResponseReservation> reservations = reservationService.getReservationsCompletedForTime(period);
-        return ResponseEntity.ok().body(reservations);
     }
 
 }

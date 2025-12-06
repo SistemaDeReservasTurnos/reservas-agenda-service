@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.persistence.reservations;
+package com.servicio.reservas.agenda.infraestructure.output.persistence.reservations;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,11 +60,4 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
             @Param("endDate") LocalDate endDate,
             @Param("status") String status);
 
-
-    @Query("""
-    SELECT r FROM ReservationModel r
-    WHERE r.status = 'COMPLETED'
-    AND r.date >= :startDate
-""")
-    List<ReservationModel> findCompletedStatusByDate(@Param("startDate") LocalDate startDate);
 }

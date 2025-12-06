@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.domain;
+package com.servicio.reservas.agenda.domain.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

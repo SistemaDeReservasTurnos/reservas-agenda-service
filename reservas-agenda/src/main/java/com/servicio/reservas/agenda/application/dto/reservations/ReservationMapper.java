@@ -47,4 +47,21 @@ public class ReservationMapper {
         reservation.setAmount(amount);
         return reservation;
     }
+
+    public static ReportReservationEvent toReport(ResponseReservation reservation){
+
+        ReportReservationEvent reportReservationEvent = new ReportReservationEvent();
+        reportReservationEvent.setId(reservation.getId());
+        reportReservationEvent.setServiceId(reservation.getServiceId());
+        reportReservationEvent.setNameService(reservation.getNameService());
+        reportReservationEvent.setUserId(reservation.getUserId());
+        reportReservationEvent.setNameUser(reservation.getNameUser());
+        reportReservationEvent.setBarberId(reservation.getBarberId());
+        reportReservationEvent.setNameBarber(reservation.getNameBarber());
+        reportReservationEvent.setDate(reservation.getDate());
+        reportReservationEvent.setStatus(reservation.getStatus());
+        reportReservationEvent.setAmount(reservation.getAmount());
+
+        return reportReservationEvent;
+    }
 }

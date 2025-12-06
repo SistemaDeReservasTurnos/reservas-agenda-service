@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.persistence.reservations;
+package com.servicio.reservas.agenda.infraestructure.output.persistence.reservations;
 
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 

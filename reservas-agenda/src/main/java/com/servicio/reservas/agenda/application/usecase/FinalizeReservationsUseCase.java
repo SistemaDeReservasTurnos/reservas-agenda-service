@@ -1,8 +1,10 @@
 package com.servicio.reservas.agenda.application.usecase;
 
+import com.servicio.reservas.agenda.application.dto.reservations.CompletedReservationEvent;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
 import com.servicio.reservas.agenda.domain.repository.IShiftRepository;
+import com.servicio.reservas.agenda.infraestructure.output.messaging.EventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,10 +16,15 @@ public class FinalizeReservationsUseCase {
 
     private final IReservationRepository reservationRepository;
     private final IShiftRepository shiftRepository;
+    private final EventPublisher eventoPublisher;
 
-    public FinalizeReservationsUseCase(IReservationRepository reservationRepository,  IShiftRepository shiftRepository) {
+    public FinalizeReservationsUseCase(
+            IReservationRepository reservationRepository,
+            IShiftRepository shiftRepository,
+            EventPublisher eventoPublisher) {
         this.reservationRepository = reservationRepository;
         this.shiftRepository = shiftRepository;
+        this.eventoPublisher = eventoPublisher;
     }
 
     public void execute() {
@@ -33,6 +40,11 @@ public class FinalizeReservationsUseCase {
             reservationRepository.save(r);
 
             shiftRepository.updateStateShiftByReservationId(r.getId());
+
+            // Se completa la reserva y se envia a reportes
+            CompletedReservationEvent event = new CompletedReservationEvent();
+            event.setReservationId(r.getId());
+            eventoPublisher.publicarEvento("reserva.completada", event);
         }
     }
 }

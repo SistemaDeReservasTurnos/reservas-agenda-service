@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.persistence.shifts;
+package com.servicio.reservas.agenda.infraestructure.output.persistence.shifts;
 
 
 import com.servicio.reservas.agenda.domain.entities.Reservation;

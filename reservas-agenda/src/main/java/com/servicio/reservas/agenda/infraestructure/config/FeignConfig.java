@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure;
+package com.servicio.reservas.agenda.infraestructure.config;
 
 import feign.RequestInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
