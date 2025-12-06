@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.services;
+package com.servicio.reservas.agenda.infraestructure.output.client.services;
 
 import lombok.Data;
 import java.time.LocalTime;

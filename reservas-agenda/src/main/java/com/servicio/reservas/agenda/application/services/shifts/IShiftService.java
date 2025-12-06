@@ -1,9 +1,9 @@
 package com.servicio.reservas.agenda.application.services.shifts;
 
-import com.servicio.reservas.agenda.application.AvailabilityMode;
+import com.servicio.reservas.agenda.domain.entities.AvailabilityMode;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.entities.Shift;
-import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
+import com.servicio.reservas.agenda.infraestructure.output.client.services.ServiceDTO;
 
 
 import java.time.LocalDate;

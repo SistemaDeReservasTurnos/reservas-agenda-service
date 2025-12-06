@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.application;
+package com.servicio.reservas.agenda.domain.entities;
 
 public enum AvailabilityMode {
     CREATE,

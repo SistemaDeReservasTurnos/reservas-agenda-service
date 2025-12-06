@@ -1,23 +1,21 @@
 package com.servicio.reservas.agenda.application.services.reservations;
 
-import com.servicio.reservas.agenda.application.AvailabilityMode;
+import com.servicio.reservas.agenda.domain.entities.AvailabilityMode;
+import com.servicio.reservas.agenda.application.dto.reservations.*;
 import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationAdmin;
 import com.servicio.reservas.agenda.application.dto.reservations.filters.FilterReservationUser;
-import com.servicio.reservas.agenda.application.dto.reservations.RequestReservation;
-import com.servicio.reservas.agenda.application.dto.reservations.ReservationMapper;
-import com.servicio.reservas.agenda.application.dto.reservations.ResponseReservation;
 import com.servicio.reservas.agenda.application.services.shifts.IShiftService;
 import com.servicio.reservas.agenda.domain.entities.Reservation;
 import com.servicio.reservas.agenda.domain.repository.IReservationRepository;
+import com.servicio.reservas.agenda.infraestructure.output.messaging.EventPublisher;
 import com.servicio.reservas.agenda.infraestructure.exception.BusinessException;
 import com.servicio.reservas.agenda.infraestructure.exception.ResourceNotFoundException;
-import com.servicio.reservas.agenda.infraestructure.services.ServiceClient;
-import com.servicio.reservas.agenda.infraestructure.services.ServiceDTO;
-import com.servicio.reservas.agenda.infraestructure.users.UserClient;
-import com.servicio.reservas.agenda.infraestructure.users.UserDTO;
+import com.servicio.reservas.agenda.infraestructure.output.client.services.ServiceClient;
+import com.servicio.reservas.agenda.infraestructure.output.client.services.ServiceDTO;
+import com.servicio.reservas.agenda.infraestructure.output.client.users.UserClient;
+import com.servicio.reservas.agenda.infraestructure.output.client.users.UserDTO;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -30,12 +28,14 @@ public class ReservationService implements IReservationService {
     private final IReservationRepository  reservationRepository;
     private final UserClient userClient;
     private final ServiceClient serviceClient;
+    private final EventPublisher eventPublisher;
 
-    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository, UserClient userClient, ServiceClient serviceClient) {
+    public ReservationService(IShiftService shiftService, IReservationRepository reservationRepository, UserClient userClient, ServiceClient serviceClient, EventPublisher eventoPublisher) {
         this.shiftService = shiftService;
         this.reservationRepository = reservationRepository;
         this.userClient = userClient;
         this.serviceClient = serviceClient;
+        this.eventPublisher = eventoPublisher;
     }
 
     @Override
@@ -59,7 +59,13 @@ public class ReservationService implements IReservationService {
 
         shiftService.createShift(reservation2);
 
-        return buildResponseWithUserNames(reservation2);
+        ResponseReservation responseReservation = buildResponseWithUserNames(reservation2);
+
+        // Sending created reservation to reporting
+        ReportReservationEvent event = ReservationMapper.toReport(responseReservation);
+        eventPublisher.publishEvent("reserva.creada", event);
+
+        return responseReservation;
     }
 
     @Override
@@ -67,9 +73,9 @@ public class ReservationService implements IReservationService {
 
         Optional<ServiceDTO> serviceDTO = shiftService.validationService(reservation.getServiceId());
 
-        Reservation foundReservation = findReservationByIdInternal(id); //busco la reserva a editar
+        Reservation foundReservation = findReservationByIdInternal(id);
 
-        //modifico la reserva si active == true
+        //I modify the reservation if active == true
         if(foundReservation.getActive()){
 
             LocalTime duration = serviceDTO.map(ServiceDTO::getDuration)
@@ -80,10 +86,10 @@ public class ReservationService implements IReservationService {
             Double amount = serviceDTO.map(ServiceDTO::getPrice)
                     .orElseThrow(() -> new IllegalArgumentException("The price is empty"));
 
-            //valido el turno antes de modificar la reserva
+            //Shift validated before modifying the reservation
             shiftService.validateShift(ReservationMapper.toDomain(reservation, endTime, amount),  AvailabilityMode.UPDATE);
 
-            //edito
+            //edit
             foundReservation.updateReservation(reservation.getDate(), reservation.getTimeStart(), endTime);
             Reservation updatedR = reservationRepository.save(foundReservation);
 
@@ -110,6 +116,10 @@ public class ReservationService implements IReservationService {
             foundReservation.setActive(false);
             reservationRepository.save(foundReservation);
             shiftService.deleteShiftFromReservation(id);
+
+            CancelReservationEvent event = new CancelReservationEvent();
+            event.setReservationId(foundReservation.getId());
+            eventPublisher.publishEvent("reserva.cancelada", event);
 
         }else{
             throw new BusinessException("To cancel a reservation, you must give at least 24 hours' notice. ");
@@ -139,7 +149,7 @@ public class ReservationService implements IReservationService {
                 filters.getStatus()
         );
 
-        // Convertir a DTO
+        // Convert to DTO
         return results.stream().map(this::buildResponseWithUserNames).toList();
     }
 
@@ -155,19 +165,6 @@ public class ReservationService implements IReservationService {
 
         Reservation reservation = findReservationByIdInternal(id);
         return buildResponseWithUserNames(reservation);
-    }
-
-    @Override
-    public List<ResponseReservation> getReservationsCompletedForTime(String period) {
-
-        LocalDate startDate = switch (period.toLowerCase()) {
-            case "week" -> LocalDate.now().minusDays(7);
-            case "month" -> LocalDate.now().minusMonths(1);
-            default -> throw new BusinessException("Invalid period: " + period + ". Supported values are: 'week', 'month'");
-        };
-
-        List<Reservation> reservations = reservationRepository.findCompletedByDate(startDate);
-        return reservations.stream().map(this::buildResponseWithUserNames).toList();
     }
 
     private Reservation findReservationByIdInternal(Long id) {

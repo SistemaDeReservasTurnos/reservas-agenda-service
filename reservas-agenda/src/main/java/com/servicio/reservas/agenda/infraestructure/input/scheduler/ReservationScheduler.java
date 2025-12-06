@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.scheduler;
+package com.servicio.reservas.agenda.infraestructure.input.scheduler;
 
 import com.servicio.reservas.agenda.application.usecase.FinalizeReservationsUseCase;
 import org.springframework.scheduling.annotation.Scheduled;

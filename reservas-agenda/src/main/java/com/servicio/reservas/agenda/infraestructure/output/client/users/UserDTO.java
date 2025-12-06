@@ -1,4 +1,4 @@
-package com.servicio.reservas.agenda.infraestructure.users;
+package com.servicio.reservas.agenda.infraestructure.output.client.users;
 
 import lombok.Data;
 
