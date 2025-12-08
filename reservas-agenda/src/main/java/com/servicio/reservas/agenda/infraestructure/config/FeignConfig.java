@@ -1,29 +1,48 @@
 package com.servicio.reservas.agenda.infraestructure.config;
 
 import feign.RequestInterceptor;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.security.oauth2.client.*;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+
+import java.util.Objects;
 
 @Configuration
 public class FeignConfig {
+    @Bean
+    public OAuth2AuthorizedClientManager authorizedClientManager(
+            ClientRegistrationRepository clientRegistrationRepository,
+            OAuth2AuthorizedClientService authorizedClientService) {
+
+        OAuth2AuthorizedClientProvider authorizedClientProvider =
+                OAuth2AuthorizedClientProviderBuilder.builder()
+                        .clientCredentials()
+                        .build();
+
+        AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
+                new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+                        clientRegistrationRepository, authorizedClientService);
+        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+        return authorizedClientManager;
+    }
 
     @Bean
-    public RequestInterceptor requestInterceptor() {
-        return template -> {
-            ServletRequestAttributes attrs =
-                    (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    public RequestInterceptor oauth2FeignRequestInterceptor(OAuth2AuthorizedClientManager authorizedClientManager) {
+        return requestTemplate -> {
+            OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
+                    .withClientRegistrationId("agenda-service-client")
+                    .principal("reservas-agenda-service")
+                    .build();
 
-            if (attrs != null) {
-                HttpServletRequest request = attrs.getRequest();
-                String authHeader = request.getHeader("Authorization");
+            String accessToken = Objects.requireNonNull(
+                            authorizedClientManager.authorize(authorizeRequest),
+                            "Failed to obtain OAuth2 access token for agenda-service-client")
+                    .getAccessToken()
+                    .getTokenValue();
 
-                if (authHeader != null) {
-                    template.header("Authorization", authHeader);
-                }
-            }
+            requestTemplate.header("Authorization", "Bearer " + accessToken);
         };
     }
 }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,11 +21,13 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+
     public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
     }
 
     @PostMapping("/create")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ResponseReservation> create(@Valid @RequestBody RequestReservation request) {
 
         ResponseReservation response = reservationService.createReservation(request);
@@ -32,31 +35,36 @@ public class ReservationController {
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<ResponseReservation>  editReservation(@PathVariable Long id, @Valid @RequestBody RequestReservation request) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ResponseReservation> editReservation(@PathVariable Long id, @Valid @RequestBody RequestReservation request) {
         ResponseReservation response = reservationService.editReservation(id, request);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<String>  cancelReservation(@PathVariable Long id) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> cancelReservation(@PathVariable Long id) {
         reservationService.cancelReservation(id);
         return ResponseEntity.ok("Successful Cancellation");
     }
 
     @PutMapping("/deactivate/{id}")
-    public ResponseEntity<String>  deactivateReservation(@PathVariable Long id) {
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+    public ResponseEntity<String> deactivateReservation(@PathVariable Long id) {
         reservationService.deactivateReservation(id);
         return ResponseEntity.ok("Successful Deactivation");
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseReservation>  findReservationById(@PathVariable Long id) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ResponseReservation> findReservationById(@PathVariable Long id) {
         ResponseReservation response = reservationService.findReservationById(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/search-user")
-    public ResponseEntity<List<ResponseReservation>>  getUserReservations(
+    @PreAuthorize("hasAuthority('ROLE_CLIENTE') or hasAuthority('ROLE_EMPLEADO')")
+    public ResponseEntity<List<ResponseReservation>> getUserReservations(
 
             @RequestParam Long userId,
 
@@ -81,7 +89,9 @@ public class ReservationController {
         List<ResponseReservation> result = reservationService.searchReservationsUser(filters);
         return ResponseEntity.ok(result);
     }
+
     @GetMapping("/search-admin")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
     public ResponseEntity<List<ResponseReservation>> getAllReservationsAdmin(
 
             @RequestParam(required = false) Long userId,
