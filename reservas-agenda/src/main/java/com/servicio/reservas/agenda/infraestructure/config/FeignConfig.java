@@ -32,13 +32,13 @@ public class FeignConfig {
     public RequestInterceptor oauth2FeignRequestInterceptor(OAuth2AuthorizedClientManager authorizedClientManager) {
         return requestTemplate -> {
             OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
-                    .withClientRegistrationId("user-service-service-client")
+                    .withClientRegistrationId("agenda-service-client")
                     .principal("reservas-agenda-service")
                     .build();
 
             String accessToken = Objects.requireNonNull(
                             authorizedClientManager.authorize(authorizeRequest),
-                            "Failed to obtain OAuth2 access token for user-service-service-client")
+                            "Failed to obtain OAuth2 access token for agenda-service-client")
                     .getAccessToken()
                     .getTokenValue();
 
