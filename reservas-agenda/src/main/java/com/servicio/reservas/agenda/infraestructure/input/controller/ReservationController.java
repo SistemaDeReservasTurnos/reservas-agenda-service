@@ -91,7 +91,7 @@ public class ReservationController {
     }
 
     @GetMapping("/search-admin")
-    @PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ResponseReservation>> getAllReservationsAdmin(
 
             @RequestParam(required = false) Long userId,
