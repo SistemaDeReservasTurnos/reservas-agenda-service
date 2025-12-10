@@ -34,6 +34,7 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
     AND (COALESCE(:startDate, r.date) <= r.date)
     AND (COALESCE(:endDate, r.date) >= r.date)
     AND (:status IS NULL OR r.status = :status)
+    AND r.active = true
     ORDER BY r.date ASC
 """)
     List<ReservationModel> searchByFilters(
@@ -51,6 +52,7 @@ public interface SpringReservationRepository extends JpaRepository<ReservationMo
     AND (COALESCE(:startDate, r.date) <= r.date)
     AND (COALESCE(:endDate, r.date) >= r.date)
     AND (:status IS NULL OR r.status = :status)
+    AND r.active = true
     ORDER BY r.date ASC
 """)
     List<ReservationModel> searchAdminFilters(

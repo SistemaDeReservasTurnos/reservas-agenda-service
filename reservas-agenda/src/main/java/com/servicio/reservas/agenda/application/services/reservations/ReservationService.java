@@ -62,8 +62,8 @@ public class ReservationService implements IReservationService {
         ResponseReservation responseReservation = buildResponseWithUserNames(reservation2);
 
         // Sending created reservation to reporting
-        ReportReservationEvent event = ReservationMapper.toReport(responseReservation);
-        eventPublisher.publishEvent("reserva.creada", event);
+        //ReportReservationEvent event = ReservationMapper.toReport(responseReservation);
+        //eventPublisher.publishEvent("reserva.creada", event);
 
         return responseReservation;
     }
@@ -110,18 +110,18 @@ public class ReservationService implements IReservationService {
         LocalDateTime today = LocalDateTime.now(); //fecha y hora actual
         LocalDateTime minimumHours = reservationStartime.minusHours(24);
 
-        if(today.isBefore(minimumHours)){
+        if (today.isBefore(minimumHours)) {
 
             foundReservation.setStatus("CANCELED");
             foundReservation.setActive(false);
             reservationRepository.save(foundReservation);
             shiftService.deleteShiftFromReservation(id);
 
-            CancelReservationEvent event = new CancelReservationEvent();
-            event.setReservationId(foundReservation.getId());
-            eventPublisher.publishEvent("reserva.cancelada", event);
+            //CancelReservationEvent event = new CancelReservationEvent();
+            //event.setReservationId(foundReservation.getId());
+            //eventPublisher.publishEvent("reserva.cancelada", event);
 
-        }else{
+        } else {
             throw new BusinessException("To cancel a reservation, you must give at least 24 hours' notice. ");
         }
     }

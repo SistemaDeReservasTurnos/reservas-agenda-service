@@ -42,9 +42,9 @@ public class FinalizeReservationsUseCase {
             shiftRepository.updateStateShiftByReservationId(r.getId());
 
             // Se completa la reserva y se envia a reportes
-            CompletedReservationEvent event = new CompletedReservationEvent();
-            event.setReservationId(r.getId());
-            eventPublisher.publishEvent("reserva.completada", event);
+            //CompletedReservationEvent event = new CompletedReservationEvent();
+            //event.setReservationId(r.getId());
+            //eventPublisher.publishEvent("reserva.completada", event);
         }
     }
 }
